@@ -17,7 +17,7 @@ defmodule Melange.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Melange.Application, []},
-     extra_applications: [:logger, :runtime_tools]]
+     extra_applications: [:logger, :runtime_tools, :edeliver]]
   end
 
   # Specifies which paths to compile per environment.
@@ -35,7 +35,9 @@ defmodule Melange.Mixfile do
      {:phoenix_html, "~> 2.6"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.11"},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:edeliver, "~> 1.4.2"},
+     {:distillery, "~> 1.4"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
