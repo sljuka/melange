@@ -1,15 +1,17 @@
 defmodule Melange.Web.UserController do
   use Melange.Web, :controller
-
   alias Melange.Accounts
 
+  plug Guardian.Plug.EnsureAuthenticated, handler: Melange.Web.DefaultAuthErrorHandler
+  plug :scrub_params, "user" when action in [:create]
+
   def index(conn, _params) do
-    users = Accounts.list_users()
+    {:ok, users} = Accounts.list_users
     render(conn, "index.html", users: users)
   end
 
   def new(conn, _params) do
-    changeset = Accounts.change_user(%Melange.Accounts.User{})
+    changeset = Accounts.registration_changeset(%Accounts.User{}, %{})
     render(conn, "new.html", changeset: changeset)
   end
 
@@ -18,6 +20,7 @@ defmodule Melange.Web.UserController do
       {:ok, user} ->
         conn
         |> put_flash(:info, "User created successfully.")
+        |> Guardian.Plug.sign_in(user)
         |> redirect(to: user_path(conn, :show, user))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -31,7 +34,7 @@ defmodule Melange.Web.UserController do
 
   def edit(conn, %{"id" => id}) do
     user = Accounts.get_user!(id)
-    changeset = Accounts.change_user(user)
+    changeset = Accounts.update_changeset(user, %{})
     render(conn, "edit.html", user: user, changeset: changeset)
   end
 
@@ -50,6 +53,13 @@ defmodule Melange.Web.UserController do
 
   def delete(conn, %{"id" => id}) do
     user = Accounts.get_user!(id)
+    conn =
+      if conn.assigns.current_user == user do
+        Guardian.Plug.sign_out(conn)
+      else
+        conn
+      end
+
     {:ok, _user} = Accounts.delete_user(user)
 
     conn

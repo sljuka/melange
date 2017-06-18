@@ -20,9 +20,30 @@ defmodule Melange.Web.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
       import Melange.Web.Router.Helpers
+      alias Melange.Fixture
 
       # The default endpoint for testing
       @endpoint Melange.Web.Endpoint
+
+      def guardian_login(user, token \\ :token, opts \\ []) do
+        build_conn()
+        |> bypass_through(MelangeWeb.Web.Router, [:browser, :browser_auth])
+        |> get("/")
+        |> Map.update!(:state, fn (_) -> :set end)
+        |> Guardian.Plug.sign_in(user, token, opts)
+        |> send_resp(200, "Flush the session")
+        |> recycle
+      end
+
+      setup config do
+        if email = config[:login_as] do
+          user = Fixture.user(%{email: email})
+          conn = guardian_login(user)
+          {:ok, %{conn: conn, user: user}}
+        else
+          {:ok, %{conn: build_conn()}}
+        end
+      end
     end
   end
 
