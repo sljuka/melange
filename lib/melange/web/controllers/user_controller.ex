@@ -2,7 +2,7 @@ defmodule Melange.Web.UserController do
   use Melange.Web, :controller
   alias Melange.Accounts
 
-  # plug Guardian.Plug.EnsureAuthenticated, handler: Melange.Web.DefaultAuthErrorHandler
+  plug Guardian.Plug.EnsureAuthenticated, handler: Melange.Web.DefaultAuthErrorHandler
   plug :scrub_params, "user" when action in [:create]
 
   def index(conn, _params) do
