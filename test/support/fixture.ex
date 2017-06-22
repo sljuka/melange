@@ -4,8 +4,8 @@ defmodule Melange.Fixture do
   @user_default %{
     first_name: "First_name",
     last_name: "Last_name",
-    email: "some@mail.com",
-    password: "test"
+    email: "user@mail.com",
+    password: "test1234"
   }
 
   def user(), do: user(%{})

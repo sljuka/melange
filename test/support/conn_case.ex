@@ -41,7 +41,11 @@ defmodule Melange.Web.ConnCase do
           conn = guardian_login(user)
           {:ok, %{conn: conn, user: user}}
         else
-          {:ok, %{conn: build_conn()}}
+          conn =
+            build_conn()
+            |> bypass_through(MelangeWeb.Web.Router, [:browser, :browser_auth])
+
+          {:ok, %{conn: conn}}
         end
       end
     end

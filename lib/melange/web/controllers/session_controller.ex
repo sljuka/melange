@@ -5,7 +5,7 @@ defmodule Melange.Web.SessionController do
   plug :scrub_params, "session" when action in ~w(create)a
 
   def new(conn, _) do
-    render conn, "new.html"
+    render conn, "login.html"
   end
 
   def create(conn, %{"session" => %{"email" => email, "password" => password}}) do
@@ -18,7 +18,8 @@ defmodule Melange.Web.SessionController do
       {:error, _reason} ->
         conn
         |> put_flash(:error, "Invalid email/password combination")
-        |> render("new.html")
+        |> put_status(401)
+        |> render("login.html")
     end
   end
 
