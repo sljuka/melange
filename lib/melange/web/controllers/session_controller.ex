@@ -1,6 +1,6 @@
 defmodule Melange.Web.SessionController do
   use Melange.Web, :controller
-  alias Melange.Accounts
+  alias Melange.Users
 
   plug :scrub_params, "session" when action in ~w(create)a
 
@@ -9,7 +9,7 @@ defmodule Melange.Web.SessionController do
   end
 
   def create(conn, %{"session" => %{"email" => email, "password" => password}}) do
-    case Accounts.find_and_checkpw(email, password) do
+    case Users.find_and_checkpw(email, password) do
       {:ok, user} ->
         conn
         |> Guardian.Plug.sign_in(user)

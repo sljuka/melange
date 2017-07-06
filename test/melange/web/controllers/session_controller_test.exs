@@ -13,7 +13,7 @@ defmodule Melange.Web.SessionControllerTest do
   end
 
   test "sets current_user after successive login", %{conn: conn} do
-    user = Fixture.user
+    user = Fixture.user(%{email: "user@mail.com"})
     conn = conn
       |> post(session_path(conn, :create), session: %{email: "user@mail.com", password: "test1234"})
       |> get("/")

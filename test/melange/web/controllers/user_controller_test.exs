@@ -3,7 +3,7 @@ defmodule Melange.Web.UserControllerTest do
   alias Melange.Fixture
 
   @create_attrs %{first_name: "some_first_name", last_name: "some_last_name", email: "some@mail.com", password: "test"}
-  @update_attrs %{first_name: "updated_first_name", last_name: "updated_last_name", email: "new@mail.com"}
+  @update_attrs Map.merge(@create_attrs, %{first_name: "updated_first_name", last_name: "updated_last_name", email: "new@mail.com"})
   @invalid_attrs %{first_name: nil, last_name: nil, email: nil}
 
   @tag login_as: "pera@mail.com"

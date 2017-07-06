@@ -1,17 +1,16 @@
-defmodule Melange.Repo.Migrations.AddFieldsToUsers do
+defmodule Melange.Repo.Migrations.CreateMelange.Users.User do
   use Ecto.Migration
 
   def change do
-    Melange.Repo.delete_all(Melange.Accounts.User)
-
-    alter table(:accounts_users) do
-      remove :name
+    create table(:users) do
       add :email, :string, null: false
       add :first_name, :string, null: false
       add :last_name, :string, null: false
       add :password_hash, :string
+
+      timestamps()
     end
 
-    create unique_index(:accounts_users, [:email])
+    create unique_index(:users, [:email])
   end
 end

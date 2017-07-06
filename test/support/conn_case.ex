@@ -20,14 +20,15 @@ defmodule Melange.Web.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
       import Melange.Web.Router.Helpers
+      import Melange.GraphqlTestHelper
       alias Melange.Fixture
+      alias Melange.Users
 
       # The default endpoint for testing
       @endpoint Melange.Web.Endpoint
 
       def guardian_login(user, token \\ :token, opts \\ []) do
         build_conn()
-        |> bypass_through(MelangeWeb.Web.Router, [:browser, :browser_auth])
         |> get("/")
         |> Map.update!(:state, fn (_) -> :set end)
         |> Guardian.Plug.sign_in(user, token, opts)
@@ -36,17 +37,41 @@ defmodule Melange.Web.ConnCase do
       end
 
       setup config do
-        if email = config[:login_as] do
-          user = Fixture.user(%{email: email})
-          conn = guardian_login(user)
-          {:ok, %{conn: conn, user: user}}
-        else
-          conn =
-            build_conn()
-            |> bypass_through(MelangeWeb.Web.Router, [:browser, :browser_auth])
+        cond do
+          email = config[:login_as] ->
+            user = Fixture.user(%{email: email})
+            conn = guardian_login(user)
 
-          {:ok, %{conn: conn}}
+            {:ok, %{conn: conn, user: user}}
+          email = config[:token_login_as] ->
+            user = Fixture.user(%{email: email})
+            {:ok, token} = Users.create_token(email, "test1234")
+
+            conn =
+              build_conn()
+              |> recycle
+              |> Map.update!(:state, fn (_) -> :set end)
+              |> put_req_header("authorization", "Bearer #{token}")
+
+            {:ok, %{conn: conn, user: user}}
+          true ->
+            {:ok, %{conn: build_conn()}}
         end
+
+        # if email = config[:login_as] do
+        #   user = Fixture.user(%{email: email})
+        #   conn = guardian_login(user)
+        #   {:ok, %{conn: conn, user: user}}
+        # else if email = config[:token_login] do
+        #   conn = build_conn()
+        #   {:ok, user} = Fixture.user(%{email: email})
+        #   {:ok, token} = Users.create_token(email, "test1234")
+        #   authConn = put_req_header(conn, "authorization", "Bearer #{token.token}")
+        #
+        #   {:ok, %{conn: authConn, user: user}}
+        # else
+        #   {:ok, %{conn: build_conn()}}
+        # end
       end
     end
   end

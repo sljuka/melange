@@ -1,32 +1,25 @@
-defmodule Melange.Accounts.User do
-  use Ecto.Schema
+defmodule Melange.Users.User do
+  alias Melange.Users.User
   import Ecto.Changeset
-  alias Melange.Accounts.User
+  use Ecto.Schema
 
-
-  schema "accounts_users" do
+  schema "users" do
     field :email, :string
     field :first_name, :string
     field :last_name, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    has_many :groups, Melange.Groups.Group, foreign_key: :owner_id
 
     timestamps()
   end
 
-  def registration_changeset(%User{} = user, params) do
+  def changeset(%User{} = user, params) do
     user
     |> cast(params, [:first_name, :last_name, :email, :password])
     |> validate_required([:email, :password])
     |> unique_constraint(:email)
     |> hash_password()
-  end
-
-  def update_changeset(%User{} = user, params) do
-    user
-    |> cast(params, [:first_name, :last_name, :email])
-    |> validate_required([:first_name, :last_name, :email])
-    |> unique_constraint(:email)
   end
 
   defp hash_password(changeset) do

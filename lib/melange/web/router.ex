@@ -15,8 +15,10 @@ defmodule Melange.Web.Router do
     plug Melange.Web.CurrentUser
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
+  pipeline :graphql do
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.LoadResource
+    plug Melange.GraphQL.Context
   end
 
   scope "/", Melange.Web do
@@ -27,8 +29,11 @@ defmodule Melange.Web.Router do
     resources "/sessions", SessionController, only: [:new, :create, :delete]
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", Melange.Web do
-  #   pipe_through :api
-  # end
+  scope "/api" do
+    pipe_through [:graphql]
+
+    forward "/", Absinthe.Plug, schema: Melange.GraphQL.Schema
+  end
+
+  forward "/graphiql", Absinthe.Plug.GraphiQL, schema: Melange.GraphQL.Schema
 end

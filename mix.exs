@@ -39,7 +39,9 @@ defmodule Melange.Mixfile do
      {:edeliver, "~> 1.4.2"},
      {:distillery, "~> 1.4"},
      {:guardian, "~> 0.14"},
-     {:comeonin, "~> 3.0"}]
+     {:comeonin, "~> 3.0"},
+     {:absinthe_plug, "~> 1.1"},
+     {:poison, "~> 2.2.0"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
