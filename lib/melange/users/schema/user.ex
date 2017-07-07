@@ -22,6 +22,14 @@ defmodule Melange.Users.User do
     |> hash_password()
   end
 
+  def update_changeset(%User{} = user, params) do
+    user
+    |> cast(params, [:first_name, :last_name, :email, :password])
+    |> validate_required([:email, :password_hash])
+    |> unique_constraint(:email)
+    |> hash_password()
+  end
+
   defp hash_password(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->

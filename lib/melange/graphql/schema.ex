@@ -9,16 +9,25 @@ defmodule Melange.GraphQL.Schema do
     end
   end
 
-  input_object :update_user_params do
-    field :name, :string
-    field :email, :string
+  input_object :user_params do
+    field :first_name,  :string
+    field :last_name,   :string
+    field :password,    :string
+    field :email,       :string
   end
 
   mutation do
     field :update_user, type: :user do
-      arg :user, :update_user_params
+      arg :id,   non_null(:integer)
+      arg :user, :user_params
 
       resolve &UserResolver.update_user/2
+    end
+
+    field :create_user, type: :user do
+      arg :user, :user_params
+
+      resolve &UserResolver.create_user/2
     end
   end
 end

@@ -43,7 +43,7 @@ defmodule Melange.Web.UserControllerTest do
   end
 
   @tag login_as: "pera@mail.com"
-  test "updates chosen user and redirects when data is valid", %{conn: conn} do
+  test "updates chosen user and redirects when data is valid", %{conn: conn, user: _user} do
     user = Fixture.user
     conn = put conn, user_path(conn, :update, user), user: @update_attrs
     assert redirected_to(conn) == user_path(conn, :show, user)

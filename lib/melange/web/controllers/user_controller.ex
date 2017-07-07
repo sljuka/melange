@@ -1,6 +1,7 @@
 defmodule Melange.Web.UserController do
   use Melange.Web, :controller
   alias Melange.Users
+  alias Melange.Web.ContextAdapter
 
   plug Guardian.Plug.EnsureAuthenticated, handler: Melange.Web.DefaultAuthErrorHandler
   plug :scrub_params, "user" when action in [:create]
@@ -39,14 +40,15 @@ defmodule Melange.Web.UserController do
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Users.get_user!(id)
+    context = ContextAdapter.adapt(conn)
 
-    case Users.update_user(user, user_params) do
+    case Users.update_user(id, user_params, context) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "User updated successfully.")
         |> redirect(to: user_path(conn, :show, user))
       {:error, %Ecto.Changeset{} = changeset} ->
+        user = Users.get_user!(id)
         render(conn, "edit.html", user: user, changeset: changeset)
     end
   end

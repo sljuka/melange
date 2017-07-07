@@ -2,26 +2,28 @@ defmodule Melange.Users do
   alias Melange.Users
   alias Melange.Users.User
   alias Melange.Repo
+  alias Melange.Bouncer
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
   def list_users, do: Repo.all(User)
 
   def get_user!(id), do: Repo.get!(User, id)
 
-  def create_user(args), do: create_user({:ok, "ok"}, args)
-  def create_user({:error, _reason} = res, _args), do: res
-  def create_user(_prev, args) do
+  def create_user(args) do
     %User{}
-      |> user_changeset(args)
-      |> Repo.insert
+    |> user_changeset(args)
+    |> Repo.insert
   end
 
-  def update_user(args), do: update_user({:ok, "ok"}, args)
-  def update_user({:error, _reason} = res, _args), do: res
-  def update_user(%User{} = user, attrs) do
-    user
-    |> user_changeset(attrs)
-    |> Repo.update()
+  def update_user(id, args, context) do
+    with :ok <- Bouncer.check_authentication(context)
+    do
+      user = Users.get_user!(id)
+
+      user
+      |> update_user_changeset(args)
+      |> Repo.update
+    end
   end
 
   def create_token(user, password) do
@@ -50,5 +52,6 @@ defmodule Melange.Users do
     end
   end
 
+  def update_user_changeset(%User{} = user, params), do: User.update_changeset(user, params)
   def user_changeset(%User{} = user, params), do: User.changeset(user, params)
 end

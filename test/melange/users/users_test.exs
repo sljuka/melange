@@ -40,14 +40,14 @@ defmodule Melange.UsersTest do
 
     test "update_user/2 with valid data updates the user" do
       user = Fixture.user
-      assert {:ok, updated_user} = Users.update_user(user, @update_attrs)
+      assert {:ok, updated_user} = Users.update_user(user.id, @update_attrs, %{current_user: user})
       assert %User{} = updated_user
       assert updated_user.first_name == "Michael"
     end
 
     test "update_user/2 with invalid data returns error changeset" do
       user = Fixture.user
-      assert {:error, %Ecto.Changeset{}} = Users.update_user(user, @invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Users.update_user(user.id, @invalid_attrs, %{current_user: user})
       assert user == Users.get_user!(user.id)
     end
 

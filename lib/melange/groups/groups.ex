@@ -5,7 +5,6 @@ defmodule Melange.Groups do
   alias Melange.Groups.Group
   alias Melange.Groups.Member
   alias Melange.Repo
-  alias Melange.Users.User
 
   def create_group(args, %{current_user: current_user}) do
     multi =
@@ -23,7 +22,7 @@ defmodule Melange.Groups do
     end
   end
 
-  def list_groups(args, context) do
+  def list_groups(_args, context) do
     with :ok <- Bouncer.check_authentication(context)
     do
       Repo.all(Group)
@@ -33,13 +32,13 @@ defmodule Melange.Groups do
   def update_group(group_id, args, context) do
     with :ok <- Bouncer.check_authentication(context),
          :ok <- Bouncer.check_authorization(group_id, context, "update_group")
-      do
-        group = get_group!(group_id)
+    do
+      group = get_group!(group_id)
 
-        group
-        |> Group.changeset(args)
-        |> Repo.update
-      end
+      group
+      |> Group.changeset(args)
+      |> Repo.update
+    end
   end
 
   def get_group!(id), do: Repo.get!(Group, id)

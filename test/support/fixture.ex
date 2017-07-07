@@ -3,8 +3,8 @@ defmodule Melange.Fixture do
   alias Melange.Groups
 
   @user_default %{
-    first_name: "First_name",
-    last_name: "Last_name",
+    first_name: "Mike",
+    last_name: "Tyson",
     email: "user@mail.com",
     password: "test1234"
   }
