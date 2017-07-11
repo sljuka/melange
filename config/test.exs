@@ -7,7 +7,9 @@ config :melange, Melange.Web.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger,
+  level: :warn,
+  compile_time_purge_level: :debug
 
 # Configure your database
 config :melange, Melange.Repo,

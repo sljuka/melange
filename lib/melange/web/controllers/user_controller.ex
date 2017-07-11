@@ -54,18 +54,22 @@ defmodule Melange.Web.UserController do
   end
 
   def delete(conn, %{"id" => id}) do
-    user = Users.get_user!(id)
-    conn =
-      if conn.assigns.current_user == user do
-        Guardian.Plug.sign_out(conn)
-      else
+    context = ContextAdapter.adapt(conn)
+    res = Users.delete_user(id, context)
+    
+    case res do
+      {:ok, _user} ->
         conn
-      end
-
-    {:ok, _user} = Users.delete_user(user)
-
-    conn
-    |> put_flash(:info, "User deleted successfully.")
-    |> redirect(to: user_path(conn, :index))
+        |> put_flash(:info, "User deleted successfully.")
+        |> redirect(to: user_path(conn, :index))
+      {:error, :self_delete} ->
+        conn
+        |> put_flash(:info, "Cannot delete yourself.")
+        |> redirect(to: user_path(conn, :index))
+      {:error, :not_found} ->
+        conn
+        |> put_status(:not_found)
+        |> render(Melange.Web.ErrorView, "404.html")
+    end
   end
 end

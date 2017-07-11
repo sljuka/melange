@@ -4,10 +4,12 @@ defmodule Melange.Users do
   alias Melange.Repo
   alias Melange.Bouncer
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
+  require IEx;
 
   def list_users, do: Repo.all(User)
 
   def get_user!(id), do: Repo.get!(User, id)
+  def get_user(id), do: Repo.get(User, id)
 
   def create_user(args) do
     %User{}
@@ -33,7 +35,19 @@ defmodule Melange.Users do
     end
   end
 
-  def delete_user(%User{} = user), do: Repo.delete(user)
+  def delete_user(id, context) do
+    with :ok <- Bouncer.check_authentication(context)
+    do
+      user = Users.get_user(id)
+      current = context.current_user
+
+      case user do
+        nil -> {:error, :not_found}
+        ^current -> {:error, :self_delete}
+        _ -> Repo.delete(user)
+      end
+    end
+  end
 
   def find_user(email), do: Repo.get_by(User, email: email)
 

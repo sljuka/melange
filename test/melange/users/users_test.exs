@@ -51,9 +51,10 @@ defmodule Melange.UsersTest do
       assert user == Users.get_user!(user.id)
     end
 
-    test "delete_user/1 deletes the user" do
+    test "delete_user/2 deletes the user" do
+      current = Fixture.user
       user = Fixture.user
-      assert {:ok, %User{}} = Users.delete_user(user)
+      assert {:ok, %User{}} = Users.delete_user(user.id, %{current_user: current})
       assert_raise Ecto.NoResultsError, fn -> Users.get_user!(user.id) end
     end
 

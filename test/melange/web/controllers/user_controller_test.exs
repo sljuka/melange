@@ -64,8 +64,18 @@ defmodule Melange.Web.UserControllerTest do
     user = Fixture.user
     conn = delete conn, user_path(conn, :delete, user)
     assert redirected_to(conn) == user_path(conn, :index)
-    assert_error_sent 404, fn ->
-      get conn, user_path(conn, :show, user)
-    end
+
+    conn = get conn, user_path(conn, :index)
+    assert html_response(conn, 200) =~ "User deleted successfully"
+  end
+
+  @tag :current
+  @tag login_as: "pera@mail.com"
+  test "cannot delete self", %{conn: conn, user: user} do
+    conn = delete conn, user_path(conn, :delete, user)
+    assert redirected_to(conn) == user_path(conn, :index)
+
+    conn = get conn, user_path(conn, :index)
+    assert html_response(conn, 200) =~ "Cannot delete yourself"
   end
 end
