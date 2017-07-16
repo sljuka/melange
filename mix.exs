@@ -41,7 +41,8 @@ defmodule Melange.Mixfile do
      {:guardian, "~> 0.14"},
      {:comeonin, "~> 3.0"},
      {:absinthe_plug, "~> 1.1"},
-     {:poison, "~> 2.2.0"}]
+     {:poison, "~> 2.2.0"},
+     {:absinthe_ecto, git: "https://github.com/absinthe-graphql/absinthe_ecto.git"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

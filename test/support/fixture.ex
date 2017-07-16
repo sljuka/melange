@@ -9,30 +9,24 @@ defmodule Melange.Fixture do
     password: "test1234"
   }
 
-  @group_default %{
-    name: "New_group"
-  }
-
   def user(), do: user(%{})
-
   def user(args) do
     random_email_map = Map.merge(@user_default, %{email: "#{random_string(10)}@mail.com"})
     {:ok, user} = Users.create_user(Map.merge(random_email_map, args))
-    Map.merge(user, %{password: nil}) # remove virtual field (password)
+    Map.merge(user, %{password: nil}) # remove virtual password field
   end
 
   def group(), do: group(%{})
-
-  def group(args) do
-    owner = user()
-    new_args = Map.merge(@group_default, args)
-    group(new_args, owner)
+  def group(args), do: group(args, user())
+  def group(args, user) do
+    merge = Map.merge(%{name: random_string(10)}, args)
+    {:ok, new_group} = Groups.create_group(merge, %{current_user: user})
+    new_group
   end
 
-  def group(args, user) do
-    merge = Map.merge(@group_default, args)
-    {:ok, newGroup} = Groups.create_group(merge, %{current_user: user})
-    newGroup
+  def role(args, group, user) do
+    new_args = Map.merge(%{group_id: group.id}, args)
+    Groups.add_role(new_args, %{current_user: user})
   end
 
   defp random_string(length) do

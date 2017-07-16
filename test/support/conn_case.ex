@@ -49,29 +49,12 @@ defmodule Melange.Web.ConnCase do
 
             conn =
               build_conn()
-              |> recycle
-              |> Map.update!(:state, fn (_) -> :set end)
               |> put_req_header("authorization", "Bearer #{token}")
 
             {:ok, %{conn: conn, user: user}}
           true ->
             {:ok, %{conn: build_conn()}}
         end
-
-        # if email = config[:login_as] do
-        #   user = Fixture.user(%{email: email})
-        #   conn = guardian_login(user)
-        #   {:ok, %{conn: conn, user: user}}
-        # else if email = config[:token_login] do
-        #   conn = build_conn()
-        #   {:ok, user} = Fixture.user(%{email: email})
-        #   {:ok, token} = Users.create_token(email, "test1234")
-        #   authConn = put_req_header(conn, "authorization", "Bearer #{token.token}")
-        #
-        #   {:ok, %{conn: authConn, user: user}}
-        # else
-        #   {:ok, %{conn: build_conn()}}
-        # end
       end
     end
   end

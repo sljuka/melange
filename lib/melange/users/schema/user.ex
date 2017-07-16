@@ -9,7 +9,8 @@ defmodule Melange.Users.User do
     field :last_name, :string
     field :password, :string, virtual: true
     field :password_hash, :string
-    has_many :groups, Melange.Groups.Group, foreign_key: :owner_id
+    has_many :owned_groups, Melange.Groups.Group, foreign_key: :owner_id
+    has_many :members, Melange.Groups.Member
 
     timestamps()
   end

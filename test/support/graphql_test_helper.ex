@@ -13,6 +13,14 @@ defmodule Melange.GraphqlTestHelper do
 
   def graphql_error(decoded_response) do
     if (Map.has_key?(decoded_response, "errors")) do
+      hd(decoded_response["errors"])["error"]
+    else
+      ""
+    end
+  end
+
+  def graphql_error_message(decoded_response) do
+    if (Map.has_key?(decoded_response, "errors")) do
       hd(decoded_response["errors"])["message"]
     else
       ""
@@ -38,13 +46,46 @@ defmodule Melange.GraphqlTestHelper do
       response = post(unquote(conn), "/api", graphql_payload(unquote(query)))
       decoded_response = json_response(response, unquote(status))
       assert decoded_response
-      error_message = graphql_error(decoded_response)
+      error_message = graphql_error_message(decoded_response)
       assert(
-        Regex.match?(
-          unquote(message),
-          error_message
-        ),
+         error_message =~ unquote(message),
         "Error message does not match, message: '#{error_message}'"
+      )
+    end
+  end
+
+  defmacro assert_gql_error_map(conn, query, map, status \\ 200) do
+    quote do
+      response = post(unquote(conn), "/api", graphql_payload(unquote(query)))
+      decoded_response = json_response(response, unquote(status))
+      assert decoded_response
+      error_message = graphql_error(decoded_response)
+      assert(unquote(map) == error_message)
+    end
+  end
+
+  defmacro assert_gql_not_authenticated_error(conn, query, status \\ 200) do
+    quote do
+      response = post(unquote(conn), "/api", graphql_payload(unquote(query)))
+      decoded_response = json_response(response, unquote(status))
+      assert decoded_response
+      error_message = graphql_error_message(decoded_response)
+      assert(
+        error_message =~ ~r/User is not authenticated/,
+        "Message not matching, this is the message: #{error_message}"
+      )
+    end
+  end
+
+  defmacro assert_gql_not_authorized_error(conn, query, status \\ 200) do
+    quote do
+      response = post(unquote(conn), "/api", graphql_payload(unquote(query)))
+      decoded_response = json_response(response, unquote(status))
+      assert decoded_response
+      error_message = graphql_error_message(decoded_response)
+      assert(
+        error_message =~ ~r/User is not authorized/,
+        "Message not matching, this is the message: #{error_message}"
       )
     end
   end

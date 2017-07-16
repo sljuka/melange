@@ -1,17 +1,64 @@
-defmodule Melange.GraphQL.Resolvers.UsersTest do
+defmodule Melange.GraphQL.Resolvers.UserTest do
   alias Melange.Fixture
   use Melange.Web.ConnCase
 
-  describe "Users" do
-    @tag token_login_as: "pera@mail.com"
-    test "signed in users can update their account", %{conn: conn, user: user} do
+  describe "Users resource" do
+    test "it allows unsigned users to register an account", %{conn: conn} do
       query = """
-        mutation {
-          update_user(id: #{user.id}, user: {first_name: "Neil deGrasse", email: "ryan@ryan.com"}) {
-            name
-            email
-          }
+      mutation {
+        create_user(user: {first_name: "Mark", last_name: "Twain", email: "mtwain@fastmail.com", password: "pass1234"}) {
+          name
+          email
         }
+      }
+      """
+
+      assert_gql_data conn, query, %{
+        "create_user" => %{
+          "name" => "Mark Twain",
+          "email" => "mtwain@fastmail.com"
+        }
+      }
+    end
+
+    test "it responds with error when registering an account with invalid data", %{conn: conn} do
+      query = """
+      mutation {
+        create_user(user: {first_name: "Mark", not_exist: "Twain"}) {
+          name
+          email
+        }
+      }
+      """
+
+      assert_gql_error conn, query, ~r/field "not_exist": Unknown field\./, 400
+    end
+
+    test "it responds with error when registering an account with incomplete data", %{conn: conn} do
+      query = """
+      mutation {
+        create_user(user: {first_name: "Mark", last_name: "Twain"}) {
+          name
+          email
+        }
+      }
+      """
+
+      assert_gql_error_map conn, query, [
+        %{"email" => %{"details" => %{"validation" => "required"}, "message" => "can't be blank"}},
+        %{"password" => %{"details" => %{"validation" => "required"}, "message" => "can't be blank"}}
+      ]
+    end
+
+    @tag token_login_as: "pera@mail.com"
+    test "it allows signed users to update user accounts", %{conn: conn, user: user} do
+      query = """
+      mutation {
+        update_user(id: #{user.id}, user: {first_name: "Neil deGrasse", email: "ryan@ryan.com"}) {
+          name
+          email
+        }
+      }
       """
 
       assert_gql_data conn, query, %{
@@ -23,10 +70,10 @@ defmodule Melange.GraphQL.Resolvers.UsersTest do
     end
 
     @tag token_login_as: "pera@mail.com"
-    test "in case bad data is sent, server responds with an error", %{conn: conn, user: user} do
+    test "it responds with an error when updating an account with invalid data", %{conn: conn, user: user} do
       query = """
       mutation {
-        update_user(id: #{user.id}, user: {first_name: "Bla", not_existing_field: "ryan@ryan.com"}) {
+        update_user(id: #{user.id}, user: {first_name: "Bla", not_exist: "ryan@ryan.com"}) {
           id
           name
           email
@@ -34,11 +81,10 @@ defmodule Melange.GraphQL.Resolvers.UsersTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/field "not_existing_field": Unknown field\./, 400
+      assert_gql_error conn, query, ~r/field "not_exist": Unknown field\./, 400
     end
 
-    @tag :current
-    test "unauthenticated users can't modify accounts", %{conn: conn} do
+    test "it does not allow unsigned users to update accounts", %{conn: conn} do
       user = Fixture.user
 
       query = """
@@ -51,31 +97,29 @@ defmodule Melange.GraphQL.Resolvers.UsersTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/not authenticated/
+      assert_gql_not_authenticated_error conn, query
     end
 
-    # @tag token_login_as: "pera@mail.com"
-    # test "users can query system users without signing in", %{conn: conn, user: _user} do
-    #   Fixture.user(%{email: "test1@mail.com"})
-    #   Fixture.user(%{email: "test2@mail.com"})
-    #   Fixture.user(%{email: "test3@mail.com"})
-    #
-    #   query = """
-    #     {
-    #       users {
-    #         email
-    #       }
-    #     }
-    #   """
-    #
-    #   assert_gql_data conn, query, %{
-    #     "users" => [
-    #       %{"email" => "pera@mail.com"},
-    #       %{"email" => "test1@mail.com"},
-    #       %{"email" => "test2@mail.com"},
-    #       %{"email" => "test3@mail.com"}
-    #     ]
-    #   }
-    # end
+    test "it allows unsigned users to query other users", %{conn: conn} do
+      Fixture.user(%{email: "test1@mail.com"})
+      Fixture.user(%{email: "test2@mail.com"})
+      Fixture.user(%{email: "test3@mail.com"})
+
+      query = """
+        {
+          users {
+            email
+          }
+        }
+      """
+
+      assert_gql_data conn, query, %{
+        "users" => [
+          %{"email" => "test1@mail.com"},
+          %{"email" => "test2@mail.com"},
+          %{"email" => "test3@mail.com"}
+        ]
+      }
+    end
   end
 end

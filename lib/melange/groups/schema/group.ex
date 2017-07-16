@@ -7,6 +7,7 @@ defmodule Melange.Groups.Group do
     field :name, :string
     field :description, :string
     belongs_to :owner, Melange.Users.User, foreign_key: :owner_id
+    has_many :members, Melange.Groups.Member
 
     timestamps()
   end

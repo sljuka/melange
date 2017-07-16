@@ -6,9 +6,9 @@ defmodule Melange.GroupsTest do
   import Ecto.Query, only: [from: 2]
   use Melange.DataCase
 
-  describe "Groups" do
+  describe "Groups resource" do
 
-    test "users can create groups" do
+    test "it allows users to create groups" do
       owner = Fixture.user
       {:ok, group} = Groups.create_group(%{name: "New name"}, %{current_user: owner})
 
@@ -16,7 +16,7 @@ defmodule Melange.GroupsTest do
       assert group.name == "New name"
     end
 
-    test "group owner can update group data" do
+    test "it allows group owners to update group" do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)
 
@@ -29,18 +29,18 @@ defmodule Melange.GroupsTest do
       assert group.name == "Updated name"
     end
 
-    test "unauthenticated users can't update groups" do
+    test "it does not allow unsigned users to update groups" do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)
 
       res1 = Groups.update_group(group.id, %{name: "Updated name"}, %{current_user: nil})
       res2 = Groups.update_group(group.id, %{name: "Updated name"}, %{})
 
-      assert res1 == {:error, "User not authenticated"}
-      assert res2 == {:error, "User not authenticated"}
+      assert res1 == {:error, "User is not authenticated"}
+      assert res2 == {:error, "User is not authenticated"}
     end
 
-    test "authenticated users can list existing groups" do
+    test "it allows signed users to query existing groups" do
       group1 = Fixture.group(%{name: "Group1"})
       group2 = Fixture.group(%{name: "Group2"})
       group3 = Fixture.group(%{name: "Group3"})
@@ -49,13 +49,13 @@ defmodule Melange.GroupsTest do
       assert res == [group1, group2, group3]
     end
 
-    test "unauthenticated users can't query other groups in the system" do
+    test "it doesn't allow unsigned users to query other groups in the system" do
       res1 = Groups.list_groups(%{}, %{current_user: nil})
 
-      assert res1 == {:error, "User not authenticated"}
+      assert res1 == {:error, "User is not authenticated"}
     end
 
-    test "group names are unique" do
+    test "it doesn't allow creating a group with already existing name" do
       Fixture.group(%{name: "Group1"})
       {:error, changeset} = Groups.create_group(%{name: "Group1"}, %{current_user: Fixture.user})
 

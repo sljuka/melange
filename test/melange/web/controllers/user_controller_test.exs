@@ -69,7 +69,6 @@ defmodule Melange.Web.UserControllerTest do
     assert html_response(conn, 200) =~ "User deleted successfully"
   end
 
-  @tag :current
   @tag login_as: "pera@mail.com"
   test "cannot delete self", %{conn: conn, user: user} do
     conn = delete conn, user_path(conn, :delete, user)

@@ -4,7 +4,23 @@ defmodule Melange.Groups do
   alias Melange.Bouncer
   alias Melange.Groups.Group
   alias Melange.Groups.Member
+  alias Melange.Groups.Role
   alias Melange.Repo
+
+  def get_group!(id), do: Repo.get!(Group, id)
+
+  def get_members(group) do
+    Repo.all from member in Member,
+      where: member.group_id == ^group.id,
+      preload: [:user]
+  end
+
+  def list_groups(_args, context) do
+    with :ok <- Bouncer.check_authentication(context)
+    do
+      Repo.all(Group)
+    end
+  end
 
   def create_group(args, %{current_user: current_user}) do
     multi =
@@ -22,13 +38,6 @@ defmodule Melange.Groups do
     end
   end
 
-  def list_groups(_args, context) do
-    with :ok <- Bouncer.check_authentication(context)
-    do
-      Repo.all(Group)
-    end
-  end
-
   def update_group(group_id, args, context) do
     with :ok <- Bouncer.check_authentication(context),
          :ok <- Bouncer.check_authorization(group_id, context, "update_group")
@@ -41,12 +50,14 @@ defmodule Melange.Groups do
     end
   end
 
-  def get_group!(id), do: Repo.get!(Group, id)
-
-  def get_members(group) do
-    Repo.all from member in Member,
-      where: member.group_id == ^group.id,
-      preload: [:user]
+  def add_role(args, context) do
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(args.group_id, context, "add_role")
+    do
+      %Role{}
+      |> Role.changeset(args)
+      |> Repo.insert
+    end
   end
 
   def changeset(struct, args), do: Group.changeset(struct, args)
