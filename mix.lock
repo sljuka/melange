@@ -1,5 +1,5 @@
 %{"absinthe": {:hex, :absinthe, "1.3.2", "1d16ee5ceeb8b90e37f936b924caacc099b9da667e9c7e6a4d729f41197123d4", [:mix], [], "hexpm"},
-  "absinthe_ecto": {:git, "https://github.com/absinthe-graphql/absinthe_ecto.git", "29e99216c4080470455d94ed6888b6930ecc3abd", []},
+  "absinthe_ecto": {:hex, :absinthe_ecto, "0.1.0", "c7c670f0d1a77f98dba4912fe067cebc4f68c1c9875c8f110a0548619e758482", [:mix], [{:absinthe, "~> 1.3.0", [hex: :absinthe, repo: "hexpm", optional: false]}, {:ecto, ">= 0.0.0", [hex: :ecto, repo: "hexpm", optional: false]}], "hexpm"},
   "absinthe_plug": {:hex, :absinthe_plug, "1.3.1", "e97c9faa6a2e29be181205d994c3ca2e2c5c5dec38aea69fcd324407f6c163c6", [:mix], [{:absinthe, "~> 1.3.0", [hex: :absinthe, repo: "hexpm", optional: false]}, {:plug, "~> 1.3.2 or ~> 1.4", [hex: :plug, repo: "hexpm", optional: false]}], "hexpm"},
   "base64url": {:hex, :base64url, "0.0.1", "36a90125f5948e3afd7be97662a1504b934dd5dac78451ca6e9abf85a10286be", [:rebar], [], "hexpm"},
   "comeonin": {:hex, :comeonin, "3.0.2", "8b213268a6634bd2e31a8035a963e974681d13ccc1f73f2ae664b6ac4e993c96", [:make, :mix], [{:elixir_make, "~> 0.4", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm"},

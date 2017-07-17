@@ -29,6 +29,10 @@ defmodule Melange.Fixture do
     Groups.add_role(new_args, %{current_user: user})
   end
 
+  def join_request(group, user) do
+    Groups.request_join(group.id, %{current_user: user})
+  end
+
   defp random_string(length) do
     :crypto.strong_rand_bytes(length) |> Base.url_encode64 |> binary_part(0, length)
   end

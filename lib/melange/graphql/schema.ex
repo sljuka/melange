@@ -59,5 +59,11 @@ defmodule Melange.GraphQL.Schema do
 
       resolve &GroupResolver.add_role/2
     end
+
+    field :request_join, type: :join_request do
+      arg :id, non_null(:integer)
+
+      resolve &GroupResolver.request_join/2
+    end
   end
 end

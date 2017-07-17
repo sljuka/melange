@@ -17,18 +17,25 @@ defmodule Melange.GraphQL.Types do
   object :group do
     field :name,        non_null(:string)
     field :description, :string
+    field :roles,       list_of(:role),   resolve: assoc(:roles)
     field :owner,       :user,            resolve: assoc(:owner)
     field :members,     list_of(:member), resolve: assoc(:members)
   end
 
   object :member do
-    field :user,  :user,  resolve: assoc(:user)
-    field :group, :group, resolve: assoc(:group)
+    field :user,  :user,          resolve: assoc(:user)
+    field :group, :group,         resolve: assoc(:group)
+    field :roles, list_of(:role), resolve: assoc(:roles)
   end
 
   object :role do
     field :name,        :string
     field :description, :string
+    field :group, :group, resolve: assoc(:group)
+  end
+
+  object :join_request do
+    field :user,  :user,  resolve: assoc(:user)
     field :group, :group, resolve: assoc(:group)
   end
 end

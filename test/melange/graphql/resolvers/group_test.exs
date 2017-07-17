@@ -4,7 +4,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
 
   describe "Groups resource" do
     @tag token_login_as: "pera@mail.com"
-    test "it allows authenticated users to create groups", %{conn: conn, user: _user} do
+    test "it allows signed users to create groups", %{conn: conn, user: _user} do
       query = """
       mutation {
         create_group(group: {name: "Company", description: "Test description"}) {
@@ -91,7 +91,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
 
     @tag token_login_as: "pera@mail.com"
     test "it allows group owner to update group data", %{conn: conn, user: user} do
-      group = Fixture.group(%{}, user)
+      group = Fixture.group(%{name: "Name", description: "Description"}, user)
 
       query = """
       mutation {
@@ -126,7 +126,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       assert_gql_not_authenticated_error conn, query
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "signed users can query other groups in the system", %{conn: conn, user: _user} do
       group1 = Fixture.group()
@@ -172,7 +171,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it does not allow roles with same name to be in the same group", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
@@ -192,8 +190,152 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       ]
     end
 
+    @tag token_login_as: "pera@mail.com"
+    test "it creates a 'owner' role and assigns it to the group creator when user creates a group", %{conn: conn, user: user} do
+      query = """
+      mutation {
+        create_group(group: {name: "Company"}) {
+          roles {
+            name
+          }
+          members {
+            user {
+              email
+            }
+            roles {
+              name
+            }
+          }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "create_group" => %{
+            "roles" => [%{"name" => "owner"}],
+            "members" => [
+              %{
+                "user" => %{"email" => user.email},
+                "roles" => [%{"name" => "owner"}]
+              }
+            ]
+          }
+        }
+    end
+
+    @tag token_login_as: "pera@mail.com"
+    test "it allows users to request to join a group", %{conn: conn, user: user} do
+      owner = Fixture.user
+      group = Fixture.group(%{name: "Name", description: "Description"}, owner)
+
+      query = """
+      mutation {
+        request_join(id: #{group.id}) {
+          group {
+            name
+          }
+          user {
+            email
+          }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "request_join" => %{
+            "group" => %{"name" => "Name"},
+            "user" => %{"email" => user.email}
+          }
+        }
+    end
+
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it responds with an error in case user requests to join a group in which they are already a member", %{conn: conn, user: user} do
+      group = Fixture.group(%{name: "Name", description: "Description"}, user)
+
+      query = """
+      mutation {
+        request_join(id: #{group.id}) {
+          group {
+            name
+          }
+          user {
+            email
+          }
+        }
+      }
+      """
+
+      assert_gql_error conn, query, ~r/In field "request_join": already_member/
+    end
+
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it responds with an error when user tries to join a group in which he already sent a join requests", %{conn: conn, user: user} do
+      owner = Fixture.user
+      group = Fixture.group(%{name: "Name"}, owner)
+      Fixture.join_request(group, user)
+
+      query = """
+      mutation {
+        request_join(id: #{group.id}) {
+          group {
+            name
+          }
+          user {
+            email
+          }
+        }
+      }
+      """
+
+      assert_gql_error_map conn, query, [
+        %{"user_id" => %{"details" => %{}, "message" => "already requested to join this group"}}
+      ]
+    end
+
     @tag :pending
-    test "user gets all permissions (super_user role) in group he created" do
+    @tag token_login_as: "pera@mail.com"
+    test "it allows users to accept join requests, this adds new member to the group", %{conn: conn, user: user} do
+      owner = Fixture.user
+      group = Fixture.group(%{name: "Name"}, owner)
+      join_request = Fixture.join_request(group, user)
+
+      query = """
+      mutation {
+        accept_request(id: #{join_request.id}) {
+          user {
+            email
+          }
+          group {
+            name
+          }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "accept_request" => %{
+            "group" => %{"name" => "Name"},
+            "user" => %{"email" => user.email}
+          }
+        }
+    end
+
+    @tag :pending
+    test "users can invite other users to join their group", %{conn: conn, user: user} do
+    end
+
+    @tag :pending
+    test "users can accept group invitations", %{conn: conn, user: user} do
+    end
+
+    @tag :pending
+    test "users can accept only their invitations", %{conn: conn, user: user} do
     end
 
     @tag :pending

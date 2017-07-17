@@ -5,8 +5,10 @@ defmodule Melange.Groups.Role do
 
   schema "roles" do
     belongs_to :group, Melange.Groups.Group
-    field :name, :string
-    field :description, :string
+    field    :name,         :string
+    field    :description,  :string
+    has_many :member_roles, Melange.Groups.MemberRole
+    has_many :members, through: [:member_roles, :member]
 
     timestamps()
   end

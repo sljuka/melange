@@ -1,13 +1,10 @@
-defmodule Melange.Groups.Member do
-  alias Melange.Groups.Group
+defmodule Melange.Groups.JoinRequest do
   import Ecto.Changeset
   use Ecto.Schema
 
-  schema "members" do
+  schema "join_requests" do
     belongs_to :user, Melange.Users.User
     belongs_to :group, Melange.Groups.Group
-    has_many   :member_roles, Melange.Groups.MemberRole
-    has_many   :roles, through: [:member_roles, :role]
 
     timestamps()
   end
@@ -16,5 +13,6 @@ defmodule Melange.Groups.Member do
     struct
     |> cast(params, [:group_id, :user_id])
     |> validate_required([:group_id, :user_id])
+    |> unique_constraint(:user_id, name: :join_requests_user_id_group_id_index, message: "already requested to join this group")
   end
 end

@@ -5,6 +5,8 @@ defmodule Melange.Groups do
   alias Melange.Groups.Group
   alias Melange.Groups.Member
   alias Melange.Groups.Role
+  alias Melange.Groups.MemberRole
+  alias Melange.Groups.JoinRequest
   alias Melange.Repo
 
   def get_group!(id), do: Repo.get!(Group, id)
@@ -29,6 +31,16 @@ defmodule Melange.Groups do
       |> Multi.run(:member, fn %{group: group} ->
         %Member{}
           |> Member.changeset(%{group_id: group.id, user_id: current_user.id})
+          |> Repo.insert
+      end)
+      |> Multi.run(:role, fn %{group: group} ->
+        %Role{}
+          |> Role.changeset(%{group_id: group.id, name: "owner"})
+          |> Repo.insert
+      end)
+      |> Multi.run(:member_role, fn %{role: role, member: member} ->
+        %MemberRole{}
+          |> MemberRole.changeset(%{role_id: role.id, member_id: member.id})
           |> Repo.insert
       end)
 
@@ -60,5 +72,32 @@ defmodule Melange.Groups do
     end
   end
 
+  def request_join(group_id, context) do
+    with :ok <- Bouncer.check_authentication(context)
+    do
+      %{current_user: current_user} = context
+      if is_member?(group_id, current_user.id) do
+        {:error, :already_member}
+      else
+        %JoinRequest{}
+        |> JoinRequest.changeset(%{user_id: current_user.id, group_id: group_id})
+        |> Repo.insert
+      end
+    end
+  end
+
   def changeset(struct, args), do: Group.changeset(struct, args)
+
+  defp is_member?(group_id, user_id) do
+    query =
+      from m in Member,
+      where: m.group_id == ^group_id and m.user_id == ^user_id,
+      limit: 1,
+      select: 1
+
+    case Repo.all(query) do
+      [1] -> true
+      [] -> false
+    end
+  end
 end

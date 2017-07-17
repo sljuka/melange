@@ -24,4 +24,9 @@ defmodule Melange.GraphQL.Resolvers.Group do
     Groups.add_role(args, context)
     |> ErrorAdapter.adapt
   end
+
+  def request_join(%{id: id}, %{context: context}) do
+    Groups.request_join(id, context)
+    |> ErrorAdapter.adapt
+  end
 end

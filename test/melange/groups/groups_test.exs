@@ -73,29 +73,5 @@ defmodule Melange.GroupsTest do
       assert member.user_id == owner.id
       assert member.group_id == group.id
     end
-
-    @tag :pending
-    test "user can add new user roles in group with right permissions" do
-    end
-
-    @tag :pending
-    test "user gets all permissions (super_user role) in group he created" do
-    end
-
-    @tag :pending
-    test "user can assign roles to other group members with right permission" do
-    end
-
-    @tag :pending
-    test "user can add new permissions to an existing role" do
-    end
-
-    @tag :pending
-    test "users can't modify a group if they don't have the right permission" do
-    end
-
-    @tag :pending
-    test "User can modify a group when another member gives him permission" do
-    end
   end
 end
