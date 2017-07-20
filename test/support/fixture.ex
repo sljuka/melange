@@ -30,7 +30,14 @@ defmodule Melange.Fixture do
   end
 
   def join_request(group, user) do
-    Groups.request_join(group.id, %{current_user: user})
+    {:ok, request} = Groups.request_join(group.id, %{current_user: user})
+    request
+  end
+
+  def member(group), do: member(user(), group)
+  def member(user, group) do
+    {:ok, member} = Groups.add_member(user.id, group.id)
+    member
   end
 
   defp random_string(length) do

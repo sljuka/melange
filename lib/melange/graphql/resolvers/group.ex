@@ -29,4 +29,18 @@ defmodule Melange.GraphQL.Resolvers.Group do
     Groups.request_join(id, context)
     |> ErrorAdapter.adapt
   end
+
+  def accept_request(%{id: id}, %{context: context}) do
+    Groups.accept_request(id, context)
+    |> ErrorAdapter.adapt
+  end
+
+  def remove_member(%{id: id}, %{context: context}) do
+    Groups.remove_member(id, context)
+    |> ErrorAdapter.adapt
+  end
+
+  def get_owner_member(group, _args, _context) do
+    Groups.get_owner_member(group.id)
+  end
 end

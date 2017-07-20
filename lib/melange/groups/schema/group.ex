@@ -4,11 +4,12 @@ defmodule Melange.Groups.Group do
   use Ecto.Schema
 
   schema "groups" do
-    field :name, :string
-    field :description, :string
-    belongs_to :owner, Melange.Users.User, foreign_key: :owner_id
-    has_many :members, Melange.Groups.Member
-    has_many :roles,   Melange.Groups.Role
+    field      :name,          :string
+    field      :description,   :string
+    belongs_to :owner,         Melange.Users.User, foreign_key: :owner_id
+    has_many   :members,       Melange.Groups.Member
+    has_many   :roles,         Melange.Groups.Role
+    has_many   :join_requests, Melange.Groups.JoinRequest
 
     timestamps()
   end

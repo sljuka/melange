@@ -1,5 +1,6 @@
 defmodule Melange.GraphQL.Resolvers.GroupTest do
   alias Melange.Fixture
+  alias Melange.Groups
   use Melange.Web.ConnCase
 
   describe "Groups resource" do
@@ -48,7 +49,9 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         create_group(group: {name: "Company", description: "Test description"}) {
           name
           owner {
-            email
+            user {
+              email
+            }
           }
         }
       }
@@ -58,7 +61,9 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         %{"create_group" => %{
           "name" => "Company",
           "owner" => %{
-            "email" => user.email
+            "user" => %{
+              "email" => user.email
+            }
           }
         }}
     end
@@ -251,7 +256,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it responds with an error in case user requests to join a group in which they are already a member", %{conn: conn, user: user} do
       group = Fixture.group(%{name: "Name", description: "Description"}, user)
@@ -272,7 +276,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       assert_gql_error conn, query, ~r/In field "request_join": already_member/
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it responds with an error when user tries to join a group in which he already sent a join requests", %{conn: conn, user: user} do
       owner = Fixture.user
@@ -297,9 +300,8 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       ]
     end
 
-    @tag :pending
     @tag token_login_as: "pera@mail.com"
-    test "it allows users to accept join requests, this adds new member to the group", %{conn: conn, user: user} do
+    test "it allows users to accept join requests, which adds new member to the group and deletes the join request", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{name: "Name"}, owner)
       join_request = Fixture.join_request(group, user)
@@ -312,6 +314,14 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
           }
           group {
             name
+            join_requests {
+              id
+            }
+            members {
+              user {
+                email
+              }
+            }
           }
         }
       }
@@ -320,38 +330,141 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       assert_gql_data conn, query,
         %{
           "accept_request" => %{
-            "group" => %{"name" => "Name"},
+            "group" => %{
+              "name" => "Name",
+              "join_requests" => [],
+              "members" => [
+                %{"user" => %{"email" => owner.email}},
+                %{"user" => %{"email" => user.email}}
+              ]
+            },
             "user" => %{"email" => user.email}
           }
         }
     end
 
-    @tag :pending
-    test "users can invite other users to join their group", %{conn: conn, user: user} do
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it allows group members to remove other members from the group", %{conn: conn, user: user} do
+      group = Fixture.group(%{}, user)
+      member1 = Fixture.member(group)
+      member2 = Fixture.member(group)
+      member3 = Fixture.member(group)
+
+      query = """
+      mutation {
+        remove_member(id: #{member3.id}) {
+          members {
+            user {
+              id
+            }
+          }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "remove_member" => %{
+            "members" => [
+              %{"user" => %{"id" => "#{user.id}"}},
+              %{"user" => %{"id" => "#{member1.user_id}"}},
+              %{"user" => %{"id" => "#{member2.user_id}"}}
+            ]
+          }
+        }
+    end
+
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it doesn't allow group members to remove group owner from group members", %{conn: conn, user: user} do
+      owner = Fixture.user
+      group = Fixture.group(%{}, owner)
+      Fixture.member(user, group)
+      {:ok, owner_member} = Groups.get_owner_member(group.id)
+
+      query = """
+      mutation {
+        remove_member(id: #{owner_member.id}) {
+          members {
+            user {
+              id
+            }
+          }
+        }
+      }
+      """
+
+      assert_gql_error conn, query, ~r/In field "remove_member": can_not_remove_owner/
+    end
+
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it allows to query group owner from group type", %{conn: conn, user: user} do
+      owner = Fixture.user
+      group = Fixture.group(%{}, owner)
+      Fixture.member(user, group)
+
+      query = """
+      {
+        groups {
+          owner {
+            user {
+              email
+            }
+          }
+          members {
+            user {
+              email
+            }
+          }
+        }
+      }
+      """
+
+      assert_gql_data conn, query, %{
+        "groups" => [
+          %{
+            "owner" => %{"user" => %{"email" => owner.email}},
+            "members" => [
+              %{"user" => %{"email" => owner.email}},
+              %{"user" => %{"email" => user.email}}
+            ]
+          }
+        ]
+      }
     end
 
     @tag :pending
-    test "users can accept group invitations", %{conn: conn, user: user} do
+    test "it allows group members to invite other users to join a group", %{conn: conn, user: user} do
     end
 
     @tag :pending
-    test "users can accept only their invitations", %{conn: conn, user: user} do
+    test "it allows users to accept group invitations", %{conn: conn, user: user} do
     end
 
     @tag :pending
-    test "user can assign roles to other group members with right permission" do
+    test "it allows users to accept only their invitations", %{conn: conn, user: user} do
     end
 
     @tag :pending
-    test "user can add new permissions to an existing role" do
+    test "it allows members to assign roles to other group members" do
     end
 
     @tag :pending
-    test "users can't modify a group if they don't have the right permission" do
+    test "it allows members to add new permissions to an existing role" do
     end
 
     @tag :pending
-    test "User can modify a group when another member gives him permission" do
+    test "it doesn't allow members to modify group if they don't have the right permission" do
+    end
+
+    @tag :pending
+    test "it allows members to modify a group when another member gives them permission via role" do
+    end
+
+    @tag :pending
+    test "it allows group owner to transfer ownership to another group member" do
     end
   end
 end

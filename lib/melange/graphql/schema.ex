@@ -29,41 +29,53 @@ defmodule Melange.GraphQL.Schema do
 
   mutation do
     field :update_user, type: :user do
-      arg :id,   non_null(:integer)
-      arg :user, :user_params
+      arg :id,   non_null(:id)
+      arg :user, non_null(:user_params)
 
       resolve &UserResolver.update_user/2
     end
 
     field :create_user, type: :user do
-      arg :user, :user_params
+      arg :user, non_null(:user_params)
 
       resolve &UserResolver.create_user/2
     end
 
     field :create_group, type: :group do
-      arg :group, :group_params
+      arg :group, non_null(:group_params)
 
       resolve &GroupResolver.create_group/2
     end
 
     field :update_group, type: :group do
-      arg :id,    non_null(:integer)
-      arg :group, :group_params
+      arg :id,    non_null(:id)
+      arg :group, non_null(:group_params)
 
       resolve &GroupResolver.update_group/2
     end
 
     field :add_role, type: :role do
-      arg :role, :role_params
+      arg :role, non_null(:role_params)
 
       resolve &GroupResolver.add_role/2
     end
 
     field :request_join, type: :join_request do
-      arg :id, non_null(:integer)
+      arg :id, non_null(:id)
 
       resolve &GroupResolver.request_join/2
+    end
+
+    field :accept_request, type: :member do
+      arg :id, non_null(:id)
+
+      resolve &GroupResolver.accept_request/2
+    end
+
+    field :remove_member, type: :group do
+      arg :id, non_null(:id)
+
+      resolve &GroupResolver.remove_member/2
     end
   end
 end

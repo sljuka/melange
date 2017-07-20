@@ -86,6 +86,45 @@ defmodule Melange.Groups do
     end
   end
 
+  def accept_request(request_id, context) do
+    request = Repo.get!(JoinRequest, request_id)
+
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(request.group_id, context, "accept_request")
+    do
+      Repo.delete(request)
+      add_member(request.user_id, request.group_id)
+    end
+  end
+
+  def remove_member(member_id, context) do
+    member = Repo.get!(Member, member_id)
+    group_id = member.group_id
+
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(group_id, context, "remove_member")
+    do
+      group = Repo.get!(Group, group_id)
+      if group.owner_id === member.user_id do
+        {:error, :can_not_remove_owner}
+      else
+        Repo.delete(member)
+        {:ok, group}
+      end
+    end
+  end
+
+  def add_member(user_id, group_id) do
+    %Member{}
+    |> Member.changeset(%{user_id: user_id, group_id: group_id})
+    |> Repo.insert
+  end
+
+  def get_owner_member(group_id) do
+    group = Repo.get!(Group, group_id)
+    {:ok, Repo.get_by!(Member, user_id: group.owner_id)}
+  end
+
   def changeset(struct, args), do: Group.changeset(struct, args)
 
   defp is_member?(group_id, user_id) do
