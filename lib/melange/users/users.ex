@@ -11,6 +11,8 @@ defmodule Melange.Users do
   def get_user!(id), do: Repo.get!(User, id)
   def get_user(id), do: Repo.get(User, id)
 
+  def search(email, _context), do: {:ok, Repo.get_by(User, email: email)}
+
   def create_user(args) do
     %User{}
     |> user_changeset(args)

@@ -11,6 +11,9 @@ config :melange,
 
 # Configures the endpoint
 config :melange, Melange.Web.Endpoint,
+  http: [protocol_options: [
+    max_header_value_length: 50_000
+  ]],
   url: [host: "localhost"],
   secret_key_base: "n0zOfx6fXdKxk4WF3j9gIhv0Y3n5dPBNVoxa/BbguYRs/sZcfHtJn7fuxGyUFaXE",
   render_errors: [view: Melange.Web.ErrorView, accepts: ~w(html json)],
@@ -27,9 +30,9 @@ config :guardian, Guardian,
   verify_module: Guardian.JWT,  # optional
   issuer: "Melange",
   ttl: { 30, :days },
-  allowed_drift: 2000,
+  # allowed_drift: 2000,
   verify_issuer: true, # optional
-  secret_key: "ZtyM7wp3sjyFchPgMltULUNOdP/84k21HqgRZ1/+/EhYWUvH+RfES7E+z+Msyf2l",
+  secret_key: "n0zOfx6fXdKxk4WF3j9gIhv0Y3n5dPBNVoxa/BbguYRs/sZcfHtJn7fuxGyUFaXE",
   serializer: Melange.Web.GuardianSerializer
 
 # Import environment specific config. This must remain at the bottom

@@ -4,6 +4,30 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
   use Melange.Web.ConnCase
 
   describe "Groups resource" do
+
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it allows users to fetch group by id", %{conn: conn, user: user} do
+      group = Fixture.group(%{name: "NewName", description: "NewDescription"}, user)
+
+      query = """
+      {
+        group(id: #{group.id}) {
+          name
+          description
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "group" => %{
+            "name" => group.name,
+            "description" => group.description
+          }
+        }
+    end
+
     @tag token_login_as: "pera@mail.com"
     test "it allows signed users to create groups", %{conn: conn, user: _user} do
       query = """

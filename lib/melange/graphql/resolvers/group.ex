@@ -3,7 +3,7 @@ defmodule Melange.GraphQL.Resolvers.Group do
   alias Melange.GraphQL.Adapters.ErrorAdapter
 
   def list_groups(args, %{context: context}) do
-    {:ok, Groups.list_groups(args, context)}
+    Groups.list_groups(args, context)
   end
 
   def create_group(args, %{context: context}) do
@@ -42,5 +42,13 @@ defmodule Melange.GraphQL.Resolvers.Group do
 
   def get_owner_member(group, _args, _context) do
     Groups.get_owner_member(group.id)
+  end
+
+  def get_group(%{id: id}, %{context: _context}) do
+    group = Groups.get_group(id)
+    case group do
+      nil -> {:error, :not_found}
+      _ -> {:ok, group}
+    end
   end
 end

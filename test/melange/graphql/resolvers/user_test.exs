@@ -21,6 +21,38 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }
     end
 
+    test "it allows user to login and retrieve a jwt, which user can append to request as header for authentication purposes", %{conn: conn} do
+      user = Fixture.user(%{email: "user@mail.com"})
+
+      query = """
+      mutation {
+        login(email: "user@mail.com", password: "test1234") {
+          token
+        }
+      }
+      """
+
+      token_data = gql_data conn, query
+
+      assert(byte_size(token_data["login"]["token"]) > 50)
+    end
+
+    test "it reports an error in case user tries to login with bad creds", %{conn: conn} do
+      user = Fixture.user(%{email: "user@mail.com"})
+
+      query = """
+      mutation {
+        login(email: "nonExisting@mail.com", password: "test1234") {
+          token
+        }
+      }
+      """
+
+      token_data = gql_data conn, query
+
+      assert_gql_error conn, query, ~r/In field \"login\": bad credentials/
+    end
+
     test "it responds with error when registering an account with invalid data", %{conn: conn} do
       query = """
       mutation {
@@ -120,6 +152,11 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
           %{"email" => "test3@mail.com"}
         ]
       }
+    end
+
+    @tag :pending
+    test "it allows users to search groups by name" do
+
     end
   end
 end

@@ -7,6 +7,16 @@ defmodule Melange.GraphQL.Schema do
   query do
     field :users,  list_of(:user),  do: resolve &UserResolver.list_users/2
     field :groups, list_of(:group), do: resolve &GroupResolver.list_groups/2
+    field :group,  :group do
+      arg :id, non_null(:id)
+
+      resolve &GroupResolver.get_group/2
+    end
+    field :user, type: :user do
+      arg :email, non_null(:string)
+
+      resolve &UserResolver.search/2
+    end
   end
 
   input_object :user_params do
@@ -76,6 +86,13 @@ defmodule Melange.GraphQL.Schema do
       arg :id, non_null(:id)
 
       resolve &GroupResolver.remove_member/2
+    end
+
+    field :login, type: :session do
+      arg :email,    non_null(:string)
+      arg :password, non_null(:string)
+
+      resolve &UserResolver.login/2
     end
   end
 end

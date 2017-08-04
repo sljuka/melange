@@ -7,8 +7,12 @@ defmodule Melange.GraphQL.Context do
 
   def call(conn, _) do
     case Guardian.Plug.current_resource(conn) do
-      nil -> conn
-      user -> put_private(conn, :absinthe, %{context: %{current_user: user}})
+      nil ->
+        IO.inspect("blaa")
+        conn
+      user ->
+        IO.inspect("blaa2")
+        put_private(conn, :absinthe, %{context: %{current_user: user}})
     end
   end
 end

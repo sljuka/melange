@@ -4,15 +4,20 @@ defmodule Melange.GraphQL.Types do
   alias Melange.GraphQL.Resolvers.Group, as: GroupResolver
 
   object :user do
-    field :id,         :id
-    field :email,      :string
-    field :first_name, :string
-    field :last_name,  :string
+    field :id,           :id
+    field :email,        :string
+    field :first_name,   :string
+    field :last_name,    :string
+    field :owned_groups, list_of(:group), resolve: assoc(:owned_groups)
     field :name, :string do
       resolve fn item, _, _ ->
         {:ok, "#{item.first_name} #{item.last_name}"}
       end
     end
+  end
+
+  object :session do
+    field :token, :string
   end
 
   object :group do

@@ -16,6 +16,7 @@ defmodule Melange.Web.Router do
   end
 
   pipeline :graphql do
+    plug Melange.Logger
     plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.LoadResource
     plug Melange.GraphQL.Context

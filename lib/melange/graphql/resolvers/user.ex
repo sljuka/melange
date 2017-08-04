@@ -18,4 +18,23 @@ defmodule Melange.GraphQL.Resolvers.User do
     res = Users.create_user(user_args)
     ErrorAdapter.adapt(res)
   end
+
+  def search(args, info) do
+    %{email: email} = args
+
+    res = Users.search(email, info)
+  end
+
+  def login(%{email: email, password: password}, _info) do
+    case Users.find_and_checkpw(email, password) do
+      {:ok, user} ->
+        with {:ok, jwt, _ } <- Guardian.encode_and_sign(user, :access) do
+          {:ok, %{token: jwt}}
+        else
+          err -> {:error, "bad credentials"}
+        end
+      {:error, _reason} ->
+        {:error, "bad credentials"}
+    end
+  end
 end

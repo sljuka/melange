@@ -38,8 +38,8 @@ defmodule Melange.Mixfile do
      {:cowboy, "~> 1.0"},
      {:edeliver, "~> 1.4.2"},
      {:distillery, "~> 1.4"},
-     {:guardian, "~> 0.14"},
-     {:comeonin, "~> 3.0"},
+     {:comeonin, "~> 2.5"},
+     {:guardian, "~> 0.13.0"},
      {:absinthe_plug, "~> 1.1"},
      {:poison, "~> 2.2.0"},
      {:absinthe_ecto, "~> 0.1.0"}]

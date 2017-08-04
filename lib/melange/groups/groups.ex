@@ -9,6 +9,7 @@ defmodule Melange.Groups do
   alias Melange.Groups.JoinRequest
   alias Melange.Repo
 
+  def get_group(id), do: Repo.get(Group, id)
   def get_group!(id), do: Repo.get!(Group, id)
 
   def get_members(group) do
@@ -20,33 +21,38 @@ defmodule Melange.Groups do
   def list_groups(_args, context) do
     with :ok <- Bouncer.check_authentication(context)
     do
-      Repo.all(Group)
+      {:ok, Repo.all(Group)}
     end
   end
 
-  def create_group(args, %{current_user: current_user}) do
-    multi =
-      Multi.new
-      |> Multi.insert(:group, Group.changeset(%Group{owner_id: current_user.id}, args))
-      |> Multi.run(:member, fn %{group: group} ->
-        %Member{}
-          |> Member.changeset(%{group_id: group.id, user_id: current_user.id})
-          |> Repo.insert
-      end)
-      |> Multi.run(:role, fn %{group: group} ->
-        %Role{}
-          |> Role.changeset(%{group_id: group.id, name: "owner"})
-          |> Repo.insert
-      end)
-      |> Multi.run(:member_role, fn %{role: role, member: member} ->
-        %MemberRole{}
-          |> MemberRole.changeset(%{role_id: role.id, member_id: member.id})
-          |> Repo.insert
-      end)
+  def create_group(args, context) do
+    with :ok <- Bouncer.check_authentication(context)
+    do
+      %{current_user: current_user} = context
 
-    case Repo.transaction(multi) do
-      {:ok, %{group: group}} -> {:ok, group}
-      {:error, _multi_name, changeset, %{}} -> {:error, changeset}
+      multi =
+        Multi.new
+        |> Multi.insert(:group, Group.changeset(%Group{owner_id: current_user.id}, args))
+        |> Multi.run(:member, fn %{group: group} ->
+          %Member{}
+            |> Member.changeset(%{group_id: group.id, user_id: current_user.id})
+            |> Repo.insert
+        end)
+        |> Multi.run(:role, fn %{group: group} ->
+          %Role{}
+            |> Role.changeset(%{group_id: group.id, name: "owner"})
+            |> Repo.insert
+        end)
+        |> Multi.run(:member_role, fn %{role: role, member: member} ->
+          %MemberRole{}
+            |> MemberRole.changeset(%{role_id: role.id, member_id: member.id})
+            |> Repo.insert
+        end)
+
+      case Repo.transaction(multi) do
+        {:ok, %{group: group}} -> {:ok, group}
+        {:error, _multi_name, changeset, %{}} -> {:error, changeset}
+      end
     end
   end
 
