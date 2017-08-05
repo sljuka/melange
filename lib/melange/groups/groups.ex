@@ -8,6 +8,7 @@ defmodule Melange.Groups do
   alias Melange.Groups.MemberRole
   alias Melange.Groups.JoinRequest
   alias Melange.Groups.GroupInvite
+  alias Melange.Groups.Permission
   alias Melange.Repo
 
   def fetch_group(%{id: id}, _context) do
@@ -16,12 +17,6 @@ defmodule Melange.Groups do
 
   def fetch_group(%{name: name}, _context) do
     {:ok, Repo.get_by!(Group, name: name)}
-  end
-
-  def get_members(group) do
-    Repo.all from member in Member,
-      where: member.group_id == ^group.id,
-      preload: [:user]
   end
 
   def list_groups(_args, context) do
@@ -123,6 +118,16 @@ defmodule Melange.Groups do
         Repo.delete(member)
         {:ok, group}
       end
+    end
+  end
+
+  def add_permission(args, context) do
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(args.group_id, context, "add_permission")
+    do
+      %Permission{}
+      |> Permission.changeset(args)
+      |> Repo.insert
     end
   end
 

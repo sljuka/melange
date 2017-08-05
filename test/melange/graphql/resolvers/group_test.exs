@@ -630,8 +630,29 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       assert_gql_error conn, query, ~r/In field "assign_role": Submitted role and member are not part of the same group/
     end
 
-    @tag :pending
-    test "it allows members to add new permissions to an existing role" do
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it is able to add new permissions to group (usually done by system)", %{conn: conn, user: _user} do
+      group = Fixture.group()
+
+      query = """
+      mutation {
+        add_permission(permission: {group_id: #{group.id}, name: "test", description: "test test test"}) {
+          group { name }
+          name
+          description
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "add_permission" => %{
+            "group" => %{"name" => group.name},
+            "name" => "test",
+            "description" => "test test test"
+          }
+        }
     end
 
     @tag :pending

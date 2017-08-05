@@ -34,7 +34,13 @@ defmodule Melange.GraphQL.Schema do
 
   input_object :role_params do
     field :name,        non_null(:string)
-    field :group_id,    non_null(:integer)
+    field :group_id,    non_null(:id)
+    field :description, :string
+  end
+
+  input_object :permission_params do
+    field :name,        non_null(:string)
+    field :group_id,    non_null(:id)
     field :description, :string
   end
 
@@ -114,6 +120,12 @@ defmodule Melange.GraphQL.Schema do
       arg :member_id, non_null(:id)
 
       resolve &GroupResolver.assign_role/2
+    end
+
+    field :add_permission, type: :permission do
+      arg :permission, non_null(:permission_params)
+
+      resolve &GroupResolver.add_permission/2
     end
   end
 end

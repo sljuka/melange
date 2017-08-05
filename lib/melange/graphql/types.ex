@@ -27,6 +27,7 @@ defmodule Melange.GraphQL.Types do
     field :description,   :string
     field :roles,         list_of(:role),         resolve: assoc(:roles)
     field :members,       list_of(:member),       resolve: assoc(:members)
+    field :permissions,   list_of(:permission),   resolve: assoc(:permissions)
     field :join_requests, list_of(:join_request), resolve: assoc(:join_requests)
     field :invites,       list_of(:group_invite), resolve: assoc(:group_invites)
     field :owner,         :member, do: resolve &GroupResolver.get_owner_member/3
@@ -56,5 +57,12 @@ defmodule Melange.GraphQL.Types do
     field :id,    :id
     field :user,  :user,  resolve: assoc(:user)
     field :group, :group, resolve: assoc(:group)
+  end
+
+  object :permission do
+    field :id,          :id
+    field :name,        :string
+    field :description, :string
+    field :group,       :group, resolve: assoc(:group)
   end
 end

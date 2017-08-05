@@ -62,4 +62,9 @@ defmodule Melange.GraphQL.Resolvers.Group do
   def fetch_group(args, %{context: context}) do
     Groups.fetch_group(args, context)
   end
+
+  def add_permission(%{permission: permission}, %{context: context}) do
+    Groups.add_permission(permission, context)
+    |> ErrorAdapter.adapt
+  end
 end
