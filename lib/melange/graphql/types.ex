@@ -65,4 +65,10 @@ defmodule Melange.GraphQL.Types do
     field :description, :string
     field :group,       :group, resolve: assoc(:group)
   end
+
+  object :role_permission do
+    field :id, :id
+    field :role, :role,  resolve: assoc(:role)
+    field :permission, :permission,  resolve: assoc(:permission)
+  end
 end

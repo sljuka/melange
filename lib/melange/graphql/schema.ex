@@ -127,5 +127,12 @@ defmodule Melange.GraphQL.Schema do
 
       resolve &GroupResolver.add_permission/2
     end
+
+    field :assign_permission, type: :role_permission do
+      arg :permission_id, non_null(:id)
+      arg :role_id, non_null(:id)
+
+      resolve &GroupResolver.assign_permission/2
+    end
   end
 end

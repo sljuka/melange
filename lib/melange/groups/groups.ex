@@ -9,6 +9,7 @@ defmodule Melange.Groups do
   alias Melange.Groups.JoinRequest
   alias Melange.Groups.GroupInvite
   alias Melange.Groups.Permission
+  alias Melange.Groups.RolePermission
   alias Melange.Repo
 
   def fetch_group(%{id: id}, _context) do
@@ -128,6 +129,18 @@ defmodule Melange.Groups do
       %Permission{}
       |> Permission.changeset(args)
       |> Repo.insert
+    end
+  end
+
+  def assign_permission(args, context) do
+    role = Repo.get!(Role, args.role_id)
+
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(role.group_id, context, "assign_permission")
+    do
+      %RolePermission{}
+        |> RolePermission.changeset(args)
+        |> Repo.insert
     end
   end
 

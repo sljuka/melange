@@ -67,4 +67,9 @@ defmodule Melange.GraphQL.Resolvers.Group do
     Groups.add_permission(permission, context)
     |> ErrorAdapter.adapt
   end
+
+  def assign_permission(args, %{context: context}) do
+    Groups.assign_permission(args, context)
+    |> ErrorAdapter.adapt
+  end
 end

@@ -24,7 +24,8 @@ defmodule Melange.Fixture do
     new_group
   end
 
-  def role(args, group, user) do
+  def role(group, args), do: role(user(), group, args)
+  def role(user, group, args) do
     new_args = Map.merge(%{group_id: group.id}, args)
     {:ok, role } = Groups.add_role(new_args, %{current_user: user})
     role
@@ -47,6 +48,13 @@ defmodule Melange.Fixture do
       %{current_user: inviter}
     )
     invite
+  end
+
+  def permission(group, args), do: permission(user(), group, args)
+  def permission(user, group, args) do
+    new_args = Map.merge(%{group_id: group.id}, args)
+    {:ok, permission} = Groups.add_permission(new_args, %{current_user: user})
+    permission
   end
 
   defp random_string(length) do

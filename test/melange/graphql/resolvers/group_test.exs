@@ -4,7 +4,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
   use Melange.Web.ConnCase
 
   describe "Groups resource" do
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it allows users to fetch groups by name", %{conn: conn, user: _user} do
       group = Fixture.group
@@ -223,7 +222,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
     @tag token_login_as: "pera@mail.com"
     test "it does not allow roles with same name to be in the same group", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
-      Fixture.role(%{name: "test"}, group, user)
+      Fixture.role(user, group, %{name: "test"})
 
       query = """
       mutation {
@@ -588,7 +587,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
     test "it allows members to assign roles to other group members", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
       member = Fixture.member(group)
-      role = Fixture.role(%{name: "New role"}, group, user)
+      role = Fixture.role(user, group, %{name: "New role"})
 
       query = """
       mutation {
@@ -615,7 +614,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       group = Fixture.group(%{}, user)
       anotherGroup = Fixture.group()
       member = Fixture.member(group)
-      role = Fixture.role(%{name: "New role"}, anotherGroup, user)
+      role = Fixture.role(user, anotherGroup, %{name: "New role"})
 
       query = """
       mutation {
@@ -630,7 +629,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       assert_gql_error conn, query, ~r/In field "assign_role": Submitted role and member are not part of the same group/
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it is able to add new permissions to group (usually done by system)", %{conn: conn, user: _user} do
       group = Fixture.group()
@@ -651,6 +649,31 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
             "group" => %{"name" => group.name},
             "name" => "test",
             "description" => "test test test"
+          }
+        }
+    end
+
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it allows members to assign permissions to roles", %{conn: conn, user: _user} do
+      group = Fixture.group(%{name: "test-group"})
+      role = Fixture.role(group, %{name: "test-role"})
+      permission = Fixture.permission(group, %{name: "test-permission"})
+
+      query = """
+      mutation {
+        assign_permission(permission_id: #{permission.id}, role_id: #{role.id}) {
+          permission { name }
+          role { name }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "assign_permission" => %{
+            "permission" => %{"name" => permission.name},
+            "role" =>       %{"name" => role.name}
           }
         }
     end
