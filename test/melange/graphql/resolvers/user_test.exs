@@ -26,7 +26,7 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
 
       query = """
       mutation {
-        login(email: "user@mail.com", password: "test1234") {
+        login(email: "#{user.email}", password: "test1234") {
           token
         }
       }
@@ -38,8 +38,6 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
     end
 
     test "it reports an error in case user tries to login with bad creds", %{conn: conn} do
-      user = Fixture.user(%{email: "user@mail.com"})
-
       query = """
       mutation {
         login(email: "nonExisting@mail.com", password: "test1234") {
@@ -47,8 +45,6 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
         }
       }
       """
-
-      token_data = gql_data conn, query
 
       assert_gql_error conn, query, ~r/In field \"login\": bad credentials/
     end

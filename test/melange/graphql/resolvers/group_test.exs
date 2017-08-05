@@ -5,7 +5,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
 
   describe "Groups resource" do
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it allows users to fetch group by id", %{conn: conn, user: user} do
       group = Fixture.group(%{name: "NewName", description: "NewDescription"}, user)
@@ -203,7 +202,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
     @tag token_login_as: "pera@mail.com"
     test "it does not allow roles with same name to be in the same group", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
-      role = Fixture.role(%{name: "test"}, group, user)
+      Fixture.role(%{name: "test"}, group, user)
 
       query = """
       mutation {
@@ -367,7 +366,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it allows group members to remove other members from the group", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
@@ -399,7 +397,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it doesn't allow group members to remove group owner from group members", %{conn: conn, user: user} do
       owner = Fixture.user
@@ -422,9 +419,8 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       assert_gql_error conn, query, ~r/In field "remove_member": can_not_remove_owner/
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
-    test "it allows to query group owner from group type", %{conn: conn, user: user} do
+    test "it allows to query group owner from group", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)
       Fixture.member(user, group)
@@ -459,20 +455,139 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
     end
 
-    @tag :pending
+    @tag token_login_as: "pera@mail.com"
     test "it allows group members to invite other users to join a group", %{conn: conn, user: user} do
+      invitee = Fixture.user
+      group = Fixture.group(%{}, user)
+
+      query = """
+      mutation {
+        invite_user(group_id: #{group.id}, user_id: #{invitee.id}) {
+          user { email }
+          group { name }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "invite_user" => %{
+            "user" => %{"email" => invitee.email},
+            "group" => %{"name" => group.name}
+          }
+        }
     end
 
-    @tag :pending
+    @tag token_login_as: "pera@mail.com"
+    test "it does not allow same user to be invited to the group multiple times", %{conn: conn, user: user} do
+      invitee = Fixture.user
+      group = Fixture.group(%{}, user)
+      Fixture.invite(user, group, invitee)
+
+      query = """
+      mutation {
+        invite_user(group_id: #{group.id}, user_id: #{invitee.id}) {
+          user { email }
+          group { name }
+        }
+      }
+      """
+
+      assert_gql_error_map conn, query, [
+        %{
+          "user_id" => %{
+            "details" => %{},
+            "message" => "user has already been invited to join the group"
+          }
+        }
+      ]
+    end
+
+    @tag token_login_as: "pera@mail.com"
+    test "it does not allow inviting users which are already members of the group", %{conn: conn, user: user} do
+      invitee = Fixture.user
+      group = Fixture.group(%{}, user)
+      Fixture.member(invitee, group)
+
+      query = """
+      mutation {
+        invite_user(group_id: #{group.id}, user_id: #{invitee.id}) {
+          user { email }
+          group { name }
+        }
+      }
+      """
+
+      assert_gql_error conn, query, ~r/In field "invite_user": already_a_member_of_group/
+    end
+
+    @tag token_login_as: "pera@mail.com"
     test "it allows users to accept group invitations", %{conn: conn, user: user} do
+      owner = Fixture.user
+      group = Fixture.group(%{}, owner)
+      invite = Fixture.invite(owner, group, user)
+
+      query = """
+      mutation {
+        accept_invite(invite_id: #{invite.id}) {
+          user { email }
+          group { name }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "accept_invite" => %{
+            "user" => %{"email" => user.email},
+            "group" => %{"name" => group.name}
+          }
+        }
     end
 
-    @tag :pending
+    @tag token_login_as: "pera@mail.com"
     test "it allows users to accept only their invitations", %{conn: conn, user: user} do
+      invitee = Fixture.user
+      group = Fixture.group(%{}, user)
+      invite = Fixture.invite(user, group, invitee)
+
+      query = """
+      mutation {
+        accept_invite(invite_id: #{invite.id}) {
+          user { email }
+          group { name }
+        }
+      }
+      """
+
+      assert_gql_error conn, query, ~r/In field "accept_invite": Only user who is invited can accept invitation/
     end
 
-    @tag :pending
-    test "it allows members to assign roles to other group members" do
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it allows members to assign roles to other group members", %{conn: conn, user: user} do
+      group = Fixture.group(%{}, user)
+      member = Fixture.member(group)
+      role = Fixture.role(%{name: "New role"}, group, user)
+
+      query = """
+      mutation {
+        assign_role(member_id: #{member.id}, role_id: #{role.id}) {
+          group { name }
+          user { id }
+          roles { name }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "assign_role" => %{
+            "group" => %{"name" => group.name},
+            "user" => %{"id" => "#{member.user_id}"},
+            "roles" => [%{"name" => role.name}]
+          }
+        }
     end
 
     @tag :pending

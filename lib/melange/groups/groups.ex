@@ -7,6 +7,7 @@ defmodule Melange.Groups do
   alias Melange.Groups.Role
   alias Melange.Groups.MemberRole
   alias Melange.Groups.JoinRequest
+  alias Melange.Groups.GroupInvite
   alias Melange.Repo
 
   def get_group(id), do: Repo.get(Group, id)
@@ -129,6 +130,49 @@ defmodule Melange.Groups do
   def get_owner_member(group_id) do
     group = Repo.get!(Group, group_id)
     {:ok, Repo.get_by!(Member, user_id: group.owner_id)}
+  end
+
+  def invite_user(args, context) do
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(args.group_id, context, "invite_user")
+    do
+      cond do
+        is_member?(args.group_id, args.user_id) -> {:error, :already_a_member_of_group}
+        true ->
+          %GroupInvite{}
+          |> GroupInvite.changeset(args)
+          |> Repo.insert
+      end
+    end
+  end
+
+  def accept_invite(args, context) do
+    invite = Repo.get!(GroupInvite, args.invite_id)
+
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(invite.group_id, context, "accept_invite")
+    do
+      cond do
+        context.current_user.id != invite.user_id -> {:error, "Only user who is invited can accept invitation"}
+        true ->
+          Repo.delete(invite)
+          add_member(invite.user_id, invite.group_id)
+      end
+    end
+  end
+
+  def assign_role(args, context) do
+    member = Repo.get!(Member, args.member_id)
+
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(member.group_id, context, "assign_role")
+    do
+      %MemberRole{}
+        |> MemberRole.changeset(args)
+        |> Repo.insert
+
+      {:ok, member}
+    end
   end
 
   def changeset(struct, args), do: Group.changeset(struct, args)

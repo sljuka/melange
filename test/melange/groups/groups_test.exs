@@ -40,7 +40,6 @@ defmodule Melange.GroupsTest do
       assert res2 == {:error, "User is not authenticated"}
     end
 
-    @tag :current
     test "it allows signed users to query existing groups" do
       group1 = Fixture.group(%{name: "Group1"})
       group2 = Fixture.group(%{name: "Group2"})

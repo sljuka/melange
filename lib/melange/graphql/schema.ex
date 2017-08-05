@@ -94,5 +94,25 @@ defmodule Melange.GraphQL.Schema do
 
       resolve &UserResolver.login/2
     end
+
+    field :invite_user, type: :group_invite do
+      arg :group_id, non_null(:id)
+      arg :user_id,  non_null(:id)
+
+      resolve &GroupResolver.invite_user/2
+    end
+
+    field :accept_invite, type: :member do
+      arg :invite_id, non_null(:id)
+
+      resolve &GroupResolver.accept_invite/2
+    end
+
+    field :assign_role, type: :member do
+      arg :role_id, non_null(:id)
+      arg :member_id, non_null(:id)
+
+      resolve &GroupResolver.assign_role/2
+    end
   end
 end

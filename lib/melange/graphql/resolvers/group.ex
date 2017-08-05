@@ -51,4 +51,19 @@ defmodule Melange.GraphQL.Resolvers.Group do
       _ -> {:ok, group}
     end
   end
+
+  def invite_user(args, %{context: context}) do
+    Groups.invite_user(args, context)
+    |> ErrorAdapter.adapt
+  end
+
+  def accept_invite(args, %{context: context}) do
+    Groups.accept_invite(args, context)
+    |> ErrorAdapter.adapt
+  end
+
+  def assign_role(args, %{context: context}) do
+    Groups.assign_role(args, context)
+    |> ErrorAdapter.adapt
+  end
 end
