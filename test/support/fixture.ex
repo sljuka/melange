@@ -57,6 +57,11 @@ defmodule Melange.Fixture do
     permission
   end
 
+  def role_permission(role, permission) do
+    {:ok , rp} = Groups.assign_permission(%{role_id: role.id, permission_id: permission.id}, %{current_user: user()})
+    rp
+  end
+
   defp random_string(length) do
     :crypto.strong_rand_bytes(length) |> Base.url_encode64 |> binary_part(0, length)
   end

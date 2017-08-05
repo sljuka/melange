@@ -653,7 +653,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it allows members to assign permissions to roles", %{conn: conn, user: _user} do
       group = Fixture.group(%{name: "test-group"})
@@ -677,6 +676,30 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
           }
         }
     end
+
+    @tag token_login_as: "pera@mail.com"
+    test "it doesn't allow assigning same permissions to same role multiple times", %{conn: conn, user: _user} do
+      group = Fixture.group(%{name: "test-group"})
+      role = Fixture.role(group, %{name: "test-role"})
+      permission = Fixture.permission(group, %{name: "test-permission"})
+      Fixture.role_permission(role, permission)
+
+      query = """
+      mutation {
+        assign_permission(permission_id: #{permission.id}, role_id: #{role.id}) {
+          permission { name }
+          role { name }
+        }
+      }
+      """
+
+      assert_gql_error_map conn, query, [
+        %{"permission_id" => %{"details" => %{}, "message" => "the permission has already been assigned to the role"}}
+      ]
+    end
+
+    @tag :pending
+    test "it allows assigning permissions only to roles which belong in same group"
 
     @tag :pending
     test "it doesn't allow members to modify group if they don't have the right permission" do
