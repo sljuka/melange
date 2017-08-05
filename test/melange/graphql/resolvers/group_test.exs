@@ -4,10 +4,31 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
   use Melange.Web.ConnCase
 
   describe "Groups resource" do
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it allows users to fetch groups by name", %{conn: conn, user: _user} do
+      group = Fixture.group
+
+      query = """
+      {
+        group(name: "#{group.name}") {
+          id
+          name
+        }
+      }
+      """
+
+      assert_gql_data conn, query, %{
+        "group" => %{
+          "id"   => "#{group.id}",
+          "name" => group.name
+        }
+      }
+    end
 
     @tag token_login_as: "pera@mail.com"
-    test "it allows users to fetch group by id", %{conn: conn, user: user} do
-      group = Fixture.group(%{name: "NewName", description: "NewDescription"}, user)
+    test "it allows users to fetch group by id", %{conn: conn, user: _user} do
+      group = Fixture.group
 
       query = """
       {
@@ -161,11 +182,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       group3 = Fixture.group()
 
       query = """
-        {
-          groups {
-            name
-          }
+      {
+        groups {
+          name
         }
+      }
       """
 
       assert_gql_data conn, query, %{
@@ -563,7 +584,6 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       assert_gql_error conn, query, ~r/In field "accept_invite": Only user who is invited can accept invitation/
     end
 
-    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it allows members to assign roles to other group members", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
@@ -588,6 +608,26 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
             "roles" => [%{"name" => role.name}]
           }
         }
+    end
+
+    @tag token_login_as: "pera@mail.com"
+    test "it allows assigning roles to members who are part of the same group", %{conn: conn, user: user} do
+      group = Fixture.group(%{}, user)
+      anotherGroup = Fixture.group()
+      member = Fixture.member(group)
+      role = Fixture.role(%{name: "New role"}, anotherGroup, user)
+
+      query = """
+      mutation {
+        assign_role(member_id: #{member.id}, role_id: #{role.id}) {
+          group { name }
+          user { id }
+          roles { name }
+        }
+      }
+      """
+
+      assert_gql_error conn, query, ~r/In field "assign_role": Submitted role and member are not part of the same group/
     end
 
     @tag :pending

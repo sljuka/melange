@@ -8,9 +8,10 @@ defmodule Melange.GraphQL.Schema do
     field :users,  list_of(:user),  do: resolve &UserResolver.list_users/2
     field :groups, list_of(:group), do: resolve &GroupResolver.list_groups/2
     field :group,  :group do
-      arg :id, non_null(:id)
+      arg :id,     :id
+      arg :name,   :string
 
-      resolve &GroupResolver.get_group/2
+      resolve &GroupResolver.fetch_group/2
     end
     field :user, type: :user do
       arg :email, non_null(:string)

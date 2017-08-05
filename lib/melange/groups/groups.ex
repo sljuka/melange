@@ -10,8 +10,13 @@ defmodule Melange.Groups do
   alias Melange.Groups.GroupInvite
   alias Melange.Repo
 
-  def get_group(id), do: Repo.get(Group, id)
-  def get_group!(id), do: Repo.get!(Group, id)
+  def fetch_group(%{id: id}, _context) do
+    {:ok, Repo.get!(Group, id)}
+  end
+
+  def fetch_group(%{name: name}, _context) do
+    {:ok, Repo.get_by!(Group, name: name)}
+  end
 
   def get_members(group) do
     Repo.all from member in Member,
@@ -61,7 +66,7 @@ defmodule Melange.Groups do
     with :ok <- Bouncer.check_authentication(context),
          :ok <- Bouncer.check_authorization(group_id, context, "update_group")
     do
-      group = get_group!(group_id)
+      group = Repo.get!(Group, group_id)
 
       group
       |> Group.changeset(args)
@@ -163,15 +168,20 @@ defmodule Melange.Groups do
 
   def assign_role(args, context) do
     member = Repo.get!(Member, args.member_id)
+    role = Repo.get!(Role, args.role_id)
 
     with :ok <- Bouncer.check_authentication(context),
          :ok <- Bouncer.check_authorization(member.group_id, context, "assign_role")
     do
-      %MemberRole{}
-        |> MemberRole.changeset(args)
-        |> Repo.insert
+      cond do
+        member.group_id != role.group_id -> {:error, "Submitted role and member are not part of the same group"}
+        true ->
+          %MemberRole{}
+            |> MemberRole.changeset(args)
+            |> Repo.insert
 
-      {:ok, member}
+          {:ok, member}
+      end
     end
   end
 

@@ -134,11 +134,11 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       Fixture.user(%{email: "test3@mail.com"})
 
       query = """
-        {
-          users {
-            email
-          }
+      {
+        users {
+          email
         }
+      }
       """
 
       assert_gql_data conn, query, %{
@@ -148,11 +148,6 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
           %{"email" => "test3@mail.com"}
         ]
       }
-    end
-
-    @tag :pending
-    test "it allows users to search groups by name" do
-
     end
   end
 end

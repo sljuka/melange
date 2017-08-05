@@ -44,14 +44,6 @@ defmodule Melange.GraphQL.Resolvers.Group do
     Groups.get_owner_member(group.id)
   end
 
-  def get_group(%{id: id}, %{context: _context}) do
-    group = Groups.get_group(id)
-    case group do
-      nil -> {:error, :not_found}
-      _ -> {:ok, group}
-    end
-  end
-
   def invite_user(args, %{context: context}) do
     Groups.invite_user(args, context)
     |> ErrorAdapter.adapt
@@ -65,5 +57,9 @@ defmodule Melange.GraphQL.Resolvers.Group do
   def assign_role(args, %{context: context}) do
     Groups.assign_role(args, context)
     |> ErrorAdapter.adapt
+  end
+
+  def fetch_group(args, %{context: context}) do
+    Groups.fetch_group(args, context)
   end
 end
