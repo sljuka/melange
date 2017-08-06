@@ -134,13 +134,18 @@ defmodule Melange.Groups do
 
   def assign_permission(args, context) do
     role = Repo.get!(Role, args.role_id)
+    permission = Repo.get!(Permission, args.permission_id)
 
     with :ok <- Bouncer.check_authentication(context),
          :ok <- Bouncer.check_authorization(role.group_id, context, "assign_permission")
     do
-      %RolePermission{}
-        |> RolePermission.changeset(args)
-        |> Repo.insert
+      cond do
+        role.group_id != permission.group_id -> {:error, "permission_id", :not_part_of_same_group}
+        true ->
+          %RolePermission{}
+            |> RolePermission.changeset(args)
+            |> Repo.insert
+      end
     end
   end
 

@@ -723,8 +723,28 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag :pending
-    test "it allows assigning permissions only to roles which belong in same group"
+    @tag token_login_as: "pera@mail.com"
+    test "it allows assigning permissions only to roles which belong in same group", %{conn: conn, user: _user} do
+      group = Fixture.group(%{name: "test-group"})
+      anotherGroup = Fixture.group(%{name: "another-group"})
+      role = Fixture.role(group, %{name: "test-role"})
+      permission = Fixture.permission(anotherGroup, %{name: "test-permission"})
+
+      query = """
+      mutation {
+        assign_permission(permission_id: #{permission.id}, role_id: #{role.id}) {
+          permission { name }
+          role { name }
+        }
+      }
+      """
+
+      assert_gql_error_data conn, query, [%{
+        "field" => "permission_id",
+        "message" => "Selected records are not part of the same group",
+        "short_message" => "not_part_of_same_group"
+      }]
+    end
 
     @tag :pending
     test "it doesn't allow members to modify group if they don't have the right permission" do

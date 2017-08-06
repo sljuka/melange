@@ -4,7 +4,6 @@ defmodule Melange.Users do
   alias Melange.Repo
   alias Melange.Bouncer
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
-  require IEx;
 
   def list_users, do: Repo.all(User)
 
