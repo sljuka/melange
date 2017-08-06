@@ -62,7 +62,7 @@ defmodule Melange.GraphqlTestHelper do
     end
   end
 
-  defmacro assert_gql_error_map(conn, query, map, status \\ 200) do
+  defmacro assert_gql_error_data(conn, query, map, status \\ 200) do
     quote do
       response = post(unquote(conn), "/api", graphql_payload(unquote(query)))
       decoded_response = json_response(response, unquote(status))

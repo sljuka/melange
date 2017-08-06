@@ -72,7 +72,7 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }
       """
 
-      assert_gql_error_map conn, query, [
+      assert_gql_error_data conn, query, [
         %{"email" => %{"details" => %{"validation" => "required"}, "message" => "can't be blank"}},
         %{"password" => %{"details" => %{"validation" => "required"}, "message" => "can't be blank"}}
       ]

@@ -80,7 +80,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_map conn, query, [
+      assert_gql_error_data conn, query, [
         %{"name" => %{"details" => %{}, "message" => "has already been taken"}}
       ]
     end
@@ -233,7 +233,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_map conn, query, [
+      assert_gql_error_data conn, query, [
         %{"name" => %{"details" => %{}, "message" => "has already been taken"}}
       ]
     end
@@ -338,7 +338,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_map conn, query, [
+      assert_gql_error_data conn, query, [
         %{"user_id" => %{"details" => %{}, "message" => "already requested to join this group"}}
       ]
     end
@@ -513,7 +513,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_map conn, query, [
+      assert_gql_error_data conn, query, [
         %{
           "user_id" => %{
             "details" => %{},
@@ -693,7 +693,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_map conn, query, [
+      assert_gql_error_data conn, query, [
         %{"permission_id" => %{"details" => %{}, "message" => "the permission has already been assigned to the role"}}
       ]
     end
