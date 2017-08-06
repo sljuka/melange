@@ -30,13 +30,6 @@ defmodule Melange.Users do
     end
   end
 
-  def create_token(user, password) do
-    with {:ok, user} <- find_and_checkpw(user, password),
-         {:ok, jwt, _ } <- Guardian.encode_and_sign(user, :access) do
-      {:ok, jwt}
-    end
-  end
-
   def delete_user(id, context) do
     with :ok <- Bouncer.check_authentication(context)
     do

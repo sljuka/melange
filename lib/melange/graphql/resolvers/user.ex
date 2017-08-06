@@ -26,13 +26,12 @@ defmodule Melange.GraphQL.Resolvers.User do
   end
 
   def login(%{email: email, password: password}, _info) do
-    case Users.find_and_checkpw(email, password) do
-      {:ok, user} ->
-        case Guardian.encode_and_sign(user, :access) do
-          {:ok, jwt, _ } -> {:ok, %{token: jwt}}
-          _err -> {:error, "email", :invalid_creds}
-        end
-      {:error, _reason} -> {:error, "email", :invalid_creds}
+    with {:ok, user} <- Users.find_and_checkpw(email, password),
+         {:ok, jwt, _ } <- Guardian.encode_and_sign(user, :access)
+    do
+      {:ok, %{token: jwt}}
+    else
+      _err -> {:error, "email", :invalid_creds}
     end
     |> ErrorAdapter.adapt
   end
