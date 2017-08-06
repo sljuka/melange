@@ -10,6 +10,7 @@ defmodule Melange.GraphQL.Resolvers.User do
     %{id: id, user: user_args} = args
 
     Users.update_user(id, user_args, context)
+    |> ErrorAdapter.adapt
   end
 
   def create_user(args, _info) do

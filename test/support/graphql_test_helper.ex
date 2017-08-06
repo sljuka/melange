@@ -19,14 +19,6 @@ defmodule Melange.GraphqlTestHelper do
     end
   end
 
-  def graphql_error_message(decoded_response) do
-    if (Map.has_key?(decoded_response, "errors")) do
-      hd(decoded_response["errors"])["message"]
-    else
-      ""
-    end
-  end
-
   defmacro gql_data(conn, query) do
     quote do
       result = post(unquote(conn), "/api", graphql_payload(unquote(query)))
@@ -60,32 +52,6 @@ defmodule Melange.GraphqlTestHelper do
         "Expected an error, but there is no error message"
       )
       assert(unquote(map) == error_message)
-    end
-  end
-
-  defmacro assert_gql_not_authenticated_error(conn, query, status \\ 200) do
-    quote do
-      response = post(unquote(conn), "/api", graphql_payload(unquote(query)))
-      decoded_response = json_response(response, unquote(status))
-      assert decoded_response
-      error_message = graphql_error_message(decoded_response)
-      assert(
-        error_message =~ ~r/User is not authenticated/,
-        "Message not matching, this is the message: #{error_message}"
-      )
-    end
-  end
-
-  defmacro assert_gql_not_authorized_error(conn, query, status \\ 200) do
-    quote do
-      response = post(unquote(conn), "/api", graphql_payload(unquote(query)))
-      decoded_response = json_response(response, unquote(status))
-      assert decoded_response
-      error_message = graphql_error_message(decoded_response)
-      assert(
-        error_message =~ ~r/User is not authorized/,
-        "Message not matching, this is the message: #{error_message}"
-      )
     end
   end
 end

@@ -33,6 +33,9 @@ defmodule Melange.ErrorMessages do
       "invalid_creds" ->
         "Invalid email or password"
 
+      "not_authenticated" ->
+        "User is not authenticated"
+
       _ -> str_message
     end
   end

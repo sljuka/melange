@@ -29,6 +29,7 @@ defmodule Melange.GroupsTest do
       assert group.name == "Updated name"
     end
 
+    @tag :current
     test "it does not allow unsigned users to update groups" do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)
@@ -36,8 +37,8 @@ defmodule Melange.GroupsTest do
       res1 = Groups.update_group(group.id, %{name: "Updated name"}, %{current_user: nil})
       res2 = Groups.update_group(group.id, %{name: "Updated name"}, %{})
 
-      assert res1 == {:error, "User is not authenticated"}
-      assert res2 == {:error, "User is not authenticated"}
+      assert res1 == {:error, :not_authenticated}
+      assert res2 == {:error, :not_authenticated}
     end
 
     test "it allows signed users to query existing groups" do
@@ -52,7 +53,7 @@ defmodule Melange.GroupsTest do
     test "it doesn't allow unsigned users to query other groups in the system" do
       res1 = Groups.list_groups(%{}, %{current_user: nil})
 
-      assert res1 == {:error, "User is not authenticated"}
+      assert res1 == {:error, :not_authenticated}
     end
 
     test "it doesn't allow creating a group with already existing name" do

@@ -173,7 +173,9 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_not_authenticated_error conn, query
+      assert_gql_error_data conn, query, [%{
+        "message" => "User is not authenticated", "field" => "", "short_message" => "not_authenticated"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"

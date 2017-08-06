@@ -127,6 +127,7 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }], 400
     end
 
+    @tag :current
     test "it does not allow unsigned users to update accounts", %{conn: conn} do
       user = Fixture.user
 
@@ -140,7 +141,9 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }
       """
 
-      assert_gql_not_authenticated_error conn, query
+      assert_gql_error_data conn, query, [%{
+        "message" => "User is not authenticated", "field" => "", "short_message" => "not_authenticated"
+      }]
     end
 
     test "it allows unsigned users to query other users", %{conn: conn} do

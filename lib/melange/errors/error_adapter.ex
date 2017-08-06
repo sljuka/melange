@@ -5,6 +5,8 @@ defmodule Melange.ErrorAdapter do
     case result do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:error, adapt_changeset(changeset)}
+      {:error, message} ->
+        {:error, adapt_field_error("", message)}
       {:error, field, message} ->
         {:error, adapt_field_error(field, message)}
       res -> res
