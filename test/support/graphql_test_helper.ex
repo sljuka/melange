@@ -13,9 +13,9 @@ defmodule Melange.GraphqlTestHelper do
 
   def graphql_error(decoded_response) do
     if (Map.has_key?(decoded_response, "errors")) do
-      hd(decoded_response["errors"])["error"]
+      hd(decoded_response["errors"])["error"] || decoded_response["errors"]
     else
-      ""
+      nil
     end
   end
 
@@ -34,7 +34,7 @@ defmodule Melange.GraphqlTestHelper do
       assert decoded_response
       error_message = graphql_error(decoded_response)
       assert(
-        error_message == "",
+        error_message == nil,
         "Error message is not empty: '#{error_message}'"
       )
       assert graphql_data(decoded_response) == unquote(data)

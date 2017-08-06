@@ -15,6 +15,6 @@ defmodule Melange.Groups.Permission do
     struct
     |> cast(params, [:group_id, :name, :description])
     |> validate_required([:group_id, :name])
-    |> unique_constraint(:name, name: :permissions_group_id_name_index, message: "has already been taken")
+    |> unique_constraint(:name, message: "has_been_taken")
   end
 end

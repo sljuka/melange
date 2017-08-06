@@ -15,7 +15,7 @@ defmodule Melange.Users do
 
   def create_user(args) do
     %User{}
-    |> user_changeset(args)
+    |> User.changeset(args)
     |> Repo.insert
   end
 

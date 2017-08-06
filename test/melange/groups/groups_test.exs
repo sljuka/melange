@@ -59,7 +59,7 @@ defmodule Melange.GroupsTest do
       Fixture.group(%{name: "Group1"})
       {:error, changeset} = Groups.create_group(%{name: "Group1"}, %{current_user: Fixture.user})
 
-      assert changeset.errors[:name] == {"has already been taken", []}
+      assert changeset.errors[:name] == {"has_been_taken", []}
     end
 
     test "user who created the group becomes member of that group" do

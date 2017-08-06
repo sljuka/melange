@@ -13,6 +13,6 @@ defmodule Melange.Groups.GroupInvite do
     struct
     |> cast(params, [:group_id, :user_id])
     |> validate_required([:group_id, :user_id])
-    |> unique_constraint(:user_id, name: :group_invites_user_id_group_id_index, message: "user has already been invited to join the group")
+    |> unique_constraint(:user_id, name: :group_invites_user_id_group_id_index, message: "user_already_invited")
   end
 end

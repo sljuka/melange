@@ -1,6 +1,6 @@
 defmodule Melange.GraphQL.Resolvers.Group do
   alias Melange.Groups
-  alias Melange.GraphQL.Adapters.ErrorAdapter
+  alias Melange.ErrorAdapter
 
   def list_groups(args, %{context: context}) do
     Groups.list_groups(args, context)

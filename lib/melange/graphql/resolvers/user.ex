@@ -1,6 +1,6 @@
 defmodule Melange.GraphQL.Resolvers.User do
   alias Melange.Users
-  alias Melange.GraphQL.Adapters.ErrorAdapter
+  alias Melange.ErrorAdapter
 
   def list_users(_args, _info) do
     {:ok, Users.list_users()}
@@ -15,26 +15,25 @@ defmodule Melange.GraphQL.Resolvers.User do
   def create_user(args, _info) do
     %{user: user_args} = args
 
-    res = Users.create_user(user_args)
-    ErrorAdapter.adapt(res)
+    Users.create_user(user_args)
+    |> ErrorAdapter.adapt
   end
 
   def search(args, info) do
     %{email: email} = args
 
-    res = Users.search(email, info)
+    Users.search(email, info)
   end
 
   def login(%{email: email, password: password}, _info) do
     case Users.find_and_checkpw(email, password) do
       {:ok, user} ->
-        with {:ok, jwt, _ } <- Guardian.encode_and_sign(user, :access) do
-          {:ok, %{token: jwt}}
-        else
-          err -> {:error, "bad credentials"}
+        case Guardian.encode_and_sign(user, :access) do
+          {:ok, jwt, _ } -> {:ok, %{token: jwt}}
+          _err -> {:error, "email", :invalid_creds}
         end
-      {:error, _reason} ->
-        {:error, "bad credentials"}
+      {:error, _reason} -> {:error, "email", :invalid_creds}
     end
+    |> ErrorAdapter.adapt
   end
 end

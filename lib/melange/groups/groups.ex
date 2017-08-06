@@ -85,7 +85,7 @@ defmodule Melange.Groups do
     do
       %{current_user: current_user} = context
       if is_member?(group_id, current_user.id) do
-        {:error, :already_member}
+        {:error, "group_id", :already_member}
       else
         %JoinRequest{}
         |> JoinRequest.changeset(%{user_id: current_user.id, group_id: group_id})
@@ -114,7 +114,7 @@ defmodule Melange.Groups do
     do
       group = Repo.get!(Group, group_id)
       if group.owner_id === member.user_id do
-        {:error, :can_not_remove_owner}
+        {:error, "id", :can_not_remove_owner}
       else
         Repo.delete(member)
         {:ok, group}
@@ -160,7 +160,8 @@ defmodule Melange.Groups do
          :ok <- Bouncer.check_authorization(args.group_id, context, "invite_user")
     do
       cond do
-        is_member?(args.group_id, args.user_id) -> {:error, :already_a_member_of_group}
+        is_member?(args.group_id, args.user_id) ->
+          {:error, "user_id", :already_member}
         true ->
           %GroupInvite{}
           |> GroupInvite.changeset(args)
@@ -176,7 +177,8 @@ defmodule Melange.Groups do
          :ok <- Bouncer.check_authorization(invite.group_id, context, "accept_invite")
     do
       cond do
-        context.current_user.id != invite.user_id -> {:error, "Only user who is invited can accept invitation"}
+        context.current_user.id != invite.user_id ->
+          {:error, "invite_id", :only_accept_own_invite}
         true ->
           Repo.delete(invite)
           add_member(invite.user_id, invite.group_id)
@@ -192,7 +194,8 @@ defmodule Melange.Groups do
          :ok <- Bouncer.check_authorization(member.group_id, context, "assign_role")
     do
       cond do
-        member.group_id != role.group_id -> {:error, "Submitted role and member are not part of the same group"}
+        member.group_id != role.group_id ->
+          {:error, "role_id", :not_part_of_same_group}
         true ->
           %MemberRole{}
             |> MemberRole.changeset(args)

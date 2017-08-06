@@ -15,6 +15,6 @@ defmodule Melange.Groups.RolePermission do
     struct
     |> cast(params, [:permission_id, :role_id])
     |> validate_required([:permission_id, :role_id])
-    |> unique_constraint(:permission_id, name: :role_permissions_permission_id_role_id_index, message: "the permission has already been assigned to the role")
+    |> unique_constraint(:permission_id, name: :role_permissions_permission_id_role_id_index, message: "permission_already_assigned_to_role")
   end
 end

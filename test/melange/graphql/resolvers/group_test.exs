@@ -80,9 +80,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_data conn, query, [
-        %{"name" => %{"details" => %{}, "message" => "has already been taken"}}
-      ]
+      assert_gql_error_data conn, query, [%{
+        "field" => "name",
+        "message" => "Unique value has already been assigned to another record",
+        "short_message" => "has_been_taken"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -233,9 +235,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_data conn, query, [
-        %{"name" => %{"details" => %{}, "message" => "has already been taken"}}
-      ]
+      assert_gql_error_data conn, query, [%{
+        "field" => "name",
+        "message" => "Unique value has already been assigned to another record",
+        "short_message" => "has_been_taken"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -316,7 +320,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/In field "request_join": already_member/
+      assert_gql_error_data conn, query, [%{
+        "field" => "group_id",
+        "short_message" => "already_member",
+        "message" => "User can't join the group since he is already member of that group"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -338,9 +346,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_data conn, query, [
-        %{"user_id" => %{"details" => %{}, "message" => "already requested to join this group"}}
-      ]
+      assert_gql_error_data conn, query, [%{
+        "field" => "user_id",
+        "message" => "User already requested to join the group",
+        "short_message" => "already_requested"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -436,7 +446,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/In field "remove_member": can_not_remove_owner/
+      assert_gql_error_data conn, query, [%{
+        "field" => "id",
+        "message" => "Owner can't be removed from group members",
+        "short_message" => "can_not_remove_owner"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -513,14 +527,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_data conn, query, [
-        %{
-          "user_id" => %{
-            "details" => %{},
-            "message" => "user has already been invited to join the group"
-          }
-        }
-      ]
+      assert_gql_error_data conn, query, [%{
+        "field" => "user_id",
+        "message" => "User has already been invited to join the group",
+        "short_message" => "user_already_invited"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -538,7 +549,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/In field "invite_user": already_a_member_of_group/
+      assert_gql_error_data conn, query, [%{
+        "field" => "user_id",
+        "message" => "User can't join the group since he is already member of that group",
+        "short_message" => "already_member"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -580,7 +595,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/In field "accept_invite": Only user who is invited can accept invitation/
+      assert_gql_error_data conn, query, [%{
+        "field" => "invite_id",
+        "message" => "User can accept only his own group invites",
+        "short_message" => "only_accept_own_invite"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -626,7 +645,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/In field "assign_role": Submitted role and member are not part of the same group/
+      assert_gql_error_data conn, query, [%{
+        "field" => "role_id",
+        "message" => "Selected records are not part of the same group",
+        "short_message" => "not_part_of_same_group"
+      }]
     end
 
     @tag token_login_as: "pera@mail.com"
@@ -693,9 +716,11 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
       """
 
-      assert_gql_error_data conn, query, [
-        %{"permission_id" => %{"details" => %{}, "message" => "the permission has already been assigned to the role"}}
-      ]
+      assert_gql_error_data conn, query, [%{
+        "field" => "permission_id",
+        "message" => "Permission has already been assigned to role",
+        "short_message" => "permission_already_assigned_to_role"
+      }]
     end
 
     @tag :pending

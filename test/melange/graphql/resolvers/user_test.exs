@@ -37,6 +37,7 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       assert(byte_size(token_data["login"]["token"]) > 50)
     end
 
+    @tag :current
     test "it reports an error in case user tries to login with bad creds", %{conn: conn} do
       query = """
       mutation {
@@ -46,9 +47,14 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/In field \"login\": bad credentials/
+      assert_gql_error_data conn, query, [%{
+        "field" => "email",
+        "message" => "Invalid email or password",
+        "short_message" => "invalid_creds"
+      }]
     end
 
+    @tag :current
     test "it responds with error when registering an account with invalid data", %{conn: conn} do
       query = """
       mutation {
@@ -59,7 +65,12 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/field "not_exist": Unknown field\./, 400
+      assert_gql_error_data conn, query, [
+        %{
+          "message" => "Argument \"user\" has invalid value {first_name: \"Mark\", not_exist: \"Twain\"}.\nIn field \"not_exist\": Unknown field.",
+          "locations" => [%{"column" => 0, "line" => 2}]
+        }
+      ], 400
     end
 
     test "it responds with error when registering an account with incomplete data", %{conn: conn} do
@@ -73,8 +84,8 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       """
 
       assert_gql_error_data conn, query, [
-        %{"email" => %{"details" => %{"validation" => "required"}, "message" => "can't be blank"}},
-        %{"password" => %{"details" => %{"validation" => "required"}, "message" => "can't be blank"}}
+        %{"field" => "email", "message" => "Value can't be blank", "short_message" => "can_not_be_blank"},
+        %{"field" => "password", "message" => "Value can't be blank", "short_message" => "can_not_be_blank"}
       ]
     end
 

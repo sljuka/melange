@@ -18,6 +18,6 @@ defmodule Melange.Groups.Group do
     group
     |> cast(params, [:name, :owner_id, :description])
     |> validate_required([:name, :owner_id])
-    |> unique_constraint(:name)
+    |> unique_constraint(:name, message: "has_been_taken")
   end
 end
