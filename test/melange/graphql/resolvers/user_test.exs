@@ -108,6 +108,7 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }
     end
 
+    @tag :current
     @tag token_login_as: "pera@mail.com"
     test "it responds with an error when updating an account with invalid data", %{conn: conn, user: user} do
       query = """
@@ -120,7 +121,10 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }
       """
 
-      assert_gql_error conn, query, ~r/field "not_exist": Unknown field\./, 400
+      assert_gql_error_data conn, query, [%{
+        "message" => "Argument \"user\" has invalid value {first_name: \"Bla\", not_exist: \"ryan@ryan.com\"}.\nIn field \"not_exist\": Unknown field.",
+        "locations" => [%{"column" => 0, "line" => 2}]
+      }], 400
     end
 
     test "it does not allow unsigned users to update accounts", %{conn: conn} do

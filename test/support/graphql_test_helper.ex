@@ -27,6 +27,14 @@ defmodule Melange.GraphqlTestHelper do
     end
   end
 
+  defmacro gql_data(conn, query) do
+    quote do
+      result = post(unquote(conn), "/api", graphql_payload(unquote(query)))
+      decoded_response = json_response(result, 200)
+      graphql_data(decoded_response)
+    end
+  end
+
   defmacro assert_gql_data(conn, query, data) do
     quote do
       result = post(unquote(conn), "/api", graphql_payload(unquote(query)))
@@ -38,27 +46,6 @@ defmodule Melange.GraphqlTestHelper do
         "Unexpected error: '#{error_message}'"
       )
       assert graphql_data(decoded_response) == unquote(data)
-    end
-  end
-
-  defmacro gql_data(conn, query) do
-    quote do
-      result = post(unquote(conn), "/api", graphql_payload(unquote(query)))
-      decoded_response = json_response(result, 200)
-      graphql_data(decoded_response)
-    end
-  end
-
-  defmacro assert_gql_error(conn, query, message, status \\ 200) do
-    quote do
-      response = post(unquote(conn), "/api", graphql_payload(unquote(query)))
-      decoded_response = json_response(response, unquote(status))
-      assert decoded_response
-      error_message = graphql_error_message(decoded_response)
-      assert(
-         error_message =~ unquote(message),
-        "Error message does not match, message: '#{error_message}'"
-      )
     end
   end
 
