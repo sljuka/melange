@@ -72,4 +72,9 @@ defmodule Melange.GraphQL.Resolvers.Group do
     Groups.assign_permission(args, context)
     |> ErrorAdapter.adapt
   end
+
+  def transfer_ownership(args, %{context: context}) do
+    Groups.transfer_ownership(args, context)
+    |> ErrorAdapter.adapt
+  end
 end

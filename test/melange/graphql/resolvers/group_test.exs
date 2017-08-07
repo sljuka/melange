@@ -94,9 +94,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         create_group(group: {name: "Company", description: "Test description"}) {
           name
           owner {
-            user {
-              email
-            }
+            user { email }
           }
         }
       }
@@ -120,9 +118,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         create_group(group: {name: "Company"}) {
           name
           members {
-            user {
-              email
-            }
+            user { email }
           }
         }
       }
@@ -186,9 +182,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
 
       query = """
       {
-        groups {
-          name
-        }
+        groups { name }
       }
       """
 
@@ -249,16 +243,10 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       query = """
       mutation {
         create_group(group: {name: "Company"}) {
-          roles {
-            name
-          }
+          roles { name }
           members {
-            user {
-              email
-            }
-            roles {
-              name
-            }
+            user { email }
+            roles { name }
           }
         }
       }
@@ -286,12 +274,8 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       query = """
       mutation {
         request_join(id: #{group.id}) {
-          group {
-            name
-          }
-          user {
-            email
-          }
+          group { name }
+          user { email }
         }
       }
       """
@@ -312,12 +296,8 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       query = """
       mutation {
         request_join(id: #{group.id}) {
-          group {
-            name
-          }
-          user {
-            email
-          }
+          group { name }
+          user { email }
         }
       }
       """
@@ -338,12 +318,8 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       query = """
       mutation {
         request_join(id: #{group.id}) {
-          group {
-            name
-          }
-          user {
-            email
-          }
+          group { name }
+          user { email }
         }
       }
       """
@@ -364,18 +340,12 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       query = """
       mutation {
         accept_request(id: #{join_request.id}) {
-          user {
-            email
-          }
+          user { email }
           group {
             name
-            join_requests {
-              id
-            }
+            join_requests { id }
             members {
-              user {
-                email
-              }
+              user { email }
             }
           }
         }
@@ -409,9 +379,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       mutation {
         remove_member(id: #{member3.id}) {
           members {
-            user {
-              id
-            }
+            user { id }
           }
         }
       }
@@ -465,14 +433,10 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       {
         groups {
           owner {
-            user {
-              email
-            }
+            user { email }
           }
           members {
-            user {
-              email
-            }
+            user { email }
           }
         }
       }
@@ -748,16 +712,75 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it allows group owner to transfer ownership to another group member", %{conn: conn, user: user} do
+      group = Fixture.group(%{name: "test-group"}, user)
+      newOwner = Fixture.user
+      member = Fixture.member(newOwner, group)
+
+      query = """
+      mutation {
+        transfer_ownership(member_id: #{member.id}) {
+          user { email }
+          group {
+            name
+            owner {
+              user { email }
+            }
+          }
+        }
+      }
+      """
+
+      assert_gql_data conn, query,
+        %{
+          "transfer_ownership" => %{
+            "user" => %{"email" => newOwner.email},
+            "group" => %{
+              "name" => group.name,
+              "owner" => %{
+                "user" => %{"email" => newOwner.email}
+              }
+            }
+          }
+        }
+    end
+
+    @tag :current
+    @tag token_login_as: "pera@mail.com"
+    test "it allows only group owners to transfer ownership to another group member", %{conn: conn, user: user} do
+      owner = Fixture.user
+      group = Fixture.group(%{name: "test-group"}, owner)
+      member = Fixture.member(user, group)
+
+      query = """
+      mutation {
+        transfer_ownership(member_id: #{member.id}) {
+          user { email }
+          group {
+            name
+            owner {
+              user { email }
+            }
+          }
+        }
+      }
+      """
+
+      assert_gql_error_data conn, query, [%{
+        "field" => "member_id",
+        "message" => "Only group owner can transfer group ownership to another member",
+        "short_message" => "only_owner_can_transfer_ownership"
+      }]
+    end
+
     @tag :pending
     test "it doesn't allow members to modify group if they don't have the right permission" do
     end
 
     @tag :pending
     test "it allows members to modify a group when another member gives them permission via role" do
-    end
-
-    @tag :pending
-    test "it allows group owner to transfer ownership to another group member" do
     end
   end
 end

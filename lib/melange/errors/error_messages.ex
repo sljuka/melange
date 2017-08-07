@@ -36,6 +36,9 @@ defmodule Melange.ErrorMessages do
       "not_authenticated" ->
         "User is not authenticated"
 
+      "only_owner_can_transfer_ownership" ->
+        "Only group owner can transfer group ownership to another member"
+
       _ -> str_message
     end
   end

@@ -29,7 +29,6 @@ defmodule Melange.GroupsTest do
       assert group.name == "Updated name"
     end
 
-    @tag :current
     test "it does not allow unsigned users to update groups" do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)

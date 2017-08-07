@@ -134,5 +134,11 @@ defmodule Melange.GraphQL.Schema do
 
       resolve &GroupResolver.assign_permission/2
     end
+
+    field :transfer_ownership, type: :member do
+      arg :member_id, non_null(:id)
+
+      resolve &GroupResolver.transfer_ownership/2
+    end
   end
 end

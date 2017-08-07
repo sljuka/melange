@@ -211,6 +211,26 @@ defmodule Melange.Groups do
     end
   end
 
+  def transfer_ownership(args, context) do
+    member = Repo.get!(Member, args.member_id)
+
+    with :ok <- Bouncer.check_authentication(context),
+         :ok <- Bouncer.check_authorization(member.group_id, context, "transfer_ownership")
+    do
+      group = Repo.get!(Group, member.group_id)
+      cond do
+        group.owner_id != context.current_user.id ->
+          {:error, "member_id", :only_owner_can_transfer_ownership}
+        true ->
+          group
+            |> Group.changeset(%{owner_id: member.user_id})
+            |> Repo.update
+
+          {:ok, member}
+      end
+    end
+  end
+
   def changeset(struct, args), do: Group.changeset(struct, args)
 
   defp is_member?(group_id, user_id) do
