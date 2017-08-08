@@ -43,7 +43,9 @@ defmodule Melange.Web.ConnCase do
             conn = guardian_login(user)
 
             {:ok, %{conn: conn, user: user}}
-          email = config[:token_login_as] ->
+
+          config[:token_login_as] || config[:token_login] ->
+            email = config[:token_login_as] || "test@mail.com"
             user = Fixture.user(%{email: email})
             {:ok, %{token: token}} = User.login(%{email: email, password: "test1234"}, %{})
 
@@ -52,8 +54,8 @@ defmodule Melange.Web.ConnCase do
               |> put_req_header("authorization", "Bearer #{token}")
 
             {:ok, %{conn: conn, user: user}}
-          true ->
-            {:ok, %{conn: build_conn()}}
+
+          true -> {:ok, %{conn: build_conn()}}
         end
       end
     end

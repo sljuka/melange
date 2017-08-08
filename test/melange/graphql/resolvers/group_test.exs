@@ -4,7 +4,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
   use Melange.Web.ConnCase
 
   describe "Groups resource" do
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows users to fetch groups by name", %{conn: conn, user: _user} do
       group = Fixture.group
 
@@ -25,7 +25,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows users to fetch group by id", %{conn: conn, user: _user} do
       group = Fixture.group
 
@@ -47,7 +47,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows signed users to create groups", %{conn: conn, user: _user} do
       query = """
       mutation {
@@ -67,7 +67,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it does not allow groups with same names", %{conn: conn, user: _user} do
       Fixture.group(%{name: "NewName"})
 
@@ -87,7 +87,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it makes the user who created the group that group's owner", %{conn: conn, user: user} do
       query = """
       mutation {
@@ -111,7 +111,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }}
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it makes the user who created the group that group's member", %{conn: conn, user: user} do
       query = """
       mutation {
@@ -135,7 +135,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows group owner to update group data", %{conn: conn, user: user} do
       group = Fixture.group(%{name: "Name", description: "Description"}, user)
 
@@ -174,7 +174,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "signed users can query other groups in the system", %{conn: conn, user: _user} do
       group1 = Fixture.group()
       group2 = Fixture.group()
@@ -195,7 +195,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows users to add new user roles to their groups", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
 
@@ -217,7 +217,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it does not allow roles with same name to be in the same group", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
       Fixture.role(user, group, %{name: "test"})
@@ -238,7 +238,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it creates a 'owner' role and assigns it to the group creator when user creates a group", %{conn: conn, user: user} do
       query = """
       mutation {
@@ -266,7 +266,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows users to request to join a group", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{name: "Name", description: "Description"}, owner)
@@ -289,7 +289,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it responds with an error in case user requests to join a group in which they are already a member", %{conn: conn, user: user} do
       group = Fixture.group(%{name: "Name", description: "Description"}, user)
 
@@ -309,7 +309,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it responds with an error when user tries to join a group in which he already sent a join requests", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{name: "Name"}, owner)
@@ -331,7 +331,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows users to accept join requests, which adds new member to the group and deletes the join request", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{name: "Name"}, owner)
@@ -368,7 +368,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows group members to remove other members from the group", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
       member1 = Fixture.member(group)
@@ -397,7 +397,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it doesn't allow group members to remove group owner from group members", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)
@@ -423,7 +423,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows to query group owner from group", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)
@@ -455,7 +455,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows group members to invite other users to join a group", %{conn: conn, user: user} do
       invitee = Fixture.user
       group = Fixture.group(%{}, user)
@@ -478,7 +478,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it does not allow same user to be invited to the group multiple times", %{conn: conn, user: user} do
       invitee = Fixture.user
       group = Fixture.group(%{}, user)
@@ -500,7 +500,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it does not allow inviting users which are already members of the group", %{conn: conn, user: user} do
       invitee = Fixture.user
       group = Fixture.group(%{}, user)
@@ -522,7 +522,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows users to accept group invitations", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)
@@ -546,7 +546,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows users to accept only their invitations", %{conn: conn, user: user} do
       invitee = Fixture.user
       group = Fixture.group(%{}, user)
@@ -568,7 +568,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows members to assign roles to other group members", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
       member = Fixture.member(group)
@@ -594,7 +594,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows assigning roles to members who are part of the same group", %{conn: conn, user: user} do
       group = Fixture.group(%{}, user)
       anotherGroup = Fixture.group()
@@ -618,7 +618,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it is able to add new permissions to group (usually done by system)", %{conn: conn, user: _user} do
       group = Fixture.group()
 
@@ -642,7 +642,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows members to assign permissions to roles", %{conn: conn, user: _user} do
       group = Fixture.group(%{name: "test-group"})
       role = Fixture.role(group, %{name: "test-role"})
@@ -666,7 +666,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
         }
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it doesn't allow assigning same permissions to same role multiple times", %{conn: conn, user: _user} do
       group = Fixture.group(%{name: "test-group"})
       role = Fixture.role(group, %{name: "test-role"})
@@ -689,7 +689,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
       }]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows assigning permissions only to roles which belong in same group", %{conn: conn, user: _user} do
       group = Fixture.group(%{name: "test-group"})
       anotherGroup = Fixture.group(%{name: "another-group"})
@@ -713,7 +713,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
     end
 
     @tag :current
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows group owner to transfer ownership to another group member", %{conn: conn, user: user} do
       group = Fixture.group(%{name: "test-group"}, user)
       newOwner = Fixture.user
@@ -748,7 +748,7 @@ defmodule Melange.GraphQL.Resolvers.GroupTest do
     end
 
     @tag :current
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows only group owners to transfer ownership to another group member", %{conn: conn, user: user} do
       owner = Fixture.user
       group = Fixture.group(%{name: "test-group"}, owner)

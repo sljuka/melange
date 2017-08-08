@@ -11,6 +11,7 @@ defmodule Melange.Users.User do
     field :password_hash, :string
     has_many :owned_groups, Melange.Groups.Group, foreign_key: :owner_id
     has_many :members, Melange.Groups.Member
+    has_many :group_invites, Melange.Groups.GroupInvite
 
     timestamps()
   end

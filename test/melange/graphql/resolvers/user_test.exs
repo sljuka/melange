@@ -89,7 +89,7 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       ]
     end
 
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it allows signed users to update user accounts", %{conn: conn, user: user} do
       query = """
       mutation {
@@ -109,7 +109,7 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
     end
 
     @tag :current
-    @tag token_login_as: "pera@mail.com"
+    @tag :token_login
     test "it responds with an error when updating an account with invalid data", %{conn: conn, user: user} do
       query = """
       mutation {
