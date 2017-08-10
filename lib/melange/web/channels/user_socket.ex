@@ -2,7 +2,7 @@ defmodule Melange.Web.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", Melange.Web.RoomChannel
+  channel "room:*", Melange.Web.RoomChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
