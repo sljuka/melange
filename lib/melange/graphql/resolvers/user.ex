@@ -1,6 +1,7 @@
 defmodule Melange.GraphQL.Resolvers.User do
   alias Melange.Users
   alias Melange.ErrorAdapter
+  alias Melange.GraphQL.ContextAdapter
 
   def list_users(_args, _info) do
     {:ok, Users.list_users()}
@@ -9,14 +10,14 @@ defmodule Melange.GraphQL.Resolvers.User do
   def update_user(args, %{context: context}) do
     %{id: id, user: user_args} = args
 
-    Users.update_user(id, user_args, context)
+    Users.update_user(Map.merge(%{id: id}, user_args), context)
     |> ErrorAdapter.adapt
   end
 
   def create_user(args, _info) do
     %{user: user_args} = args
 
-    Users.create_user(user_args)
+    Users.create_user(user_args, %{})
     |> ErrorAdapter.adapt
   end
 

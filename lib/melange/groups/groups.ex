@@ -12,13 +12,10 @@ defmodule Melange.Groups do
   alias Melange.Groups.RolePermission
   alias Melange.Repo
 
-  def fetch_group(%{id: id}, _context) do
-    {:ok, Repo.get!(Group, id)}
-  end
-
-  def fetch_group(%{name: name}, _context) do
-    {:ok, Repo.get_by!(Group, name: name)}
-  end
+  def fetch_group(%{id: id}, context), do: fetch_group(id, context)
+  def fetch_group(%{"id" => id}, context), do: fetch_group(id, context)
+  def fetch_group(%{name: name}, _context), do: {:ok, Repo.get_by!(Group, name: name)}
+  def fetch_group(id, _context), do: {:ok, Repo.get!(Group, id)}
 
   def list_groups(_args, context) do
     with :ok <- Bouncer.check_authentication(context)
@@ -58,11 +55,11 @@ defmodule Melange.Groups do
     end
   end
 
-  def update_group(group_id, args, context) do
+  def update_group(args, context) do
     with :ok <- Bouncer.check_authentication(context),
-         :ok <- Bouncer.check_authorization(group_id, context, "update_group")
+         :ok <- Bouncer.check_authorization(args.id, context, "update_group")
     do
-      group = Repo.get!(Group, group_id)
+      group = Repo.get!(Group, args.id)
 
       group
       |> Group.changeset(args)
@@ -80,7 +77,7 @@ defmodule Melange.Groups do
     end
   end
 
-  def request_join(group_id, context) do
+  def request_join(%{group_id: group_id}, context) do
     with :ok <- Bouncer.check_authentication(context)
     do
       %{current_user: current_user} = context

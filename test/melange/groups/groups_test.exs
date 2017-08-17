@@ -21,8 +21,7 @@ defmodule Melange.GroupsTest do
       group = Fixture.group(%{}, owner)
 
       {:ok, group} =
-        Groups.update_group(group.id,
-                            %{name: "Updated name"},
+        Groups.update_group(%{id: group.id, name: "Updated name"},
                             %{current_user: owner})
 
       assert group.owner_id == owner.id
@@ -33,8 +32,8 @@ defmodule Melange.GroupsTest do
       owner = Fixture.user
       group = Fixture.group(%{}, owner)
 
-      res1 = Groups.update_group(group.id, %{name: "Updated name"}, %{current_user: nil})
-      res2 = Groups.update_group(group.id, %{name: "Updated name"}, %{})
+      res1 = Groups.update_group(%{id: group.id, name: "Updated name"}, %{current_user: nil})
+      res2 = Groups.update_group(%{id: group.id, name: "Updated name"}, %{})
 
       assert res1 == {:error, :not_authenticated}
       assert res2 == {:error, :not_authenticated}

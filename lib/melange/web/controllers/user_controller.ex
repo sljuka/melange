@@ -1,7 +1,9 @@
 defmodule Melange.Web.UserController do
   use Melange.Web, :controller
   alias Melange.Users
+  alias Melange.Users.User
   alias Melange.Web.ContextAdapter
+  alias Melange.Repo
 
   plug Guardian.Plug.EnsureAuthenticated, handler: Melange.Web.DefaultAuthErrorHandler
   plug :scrub_params, "user" when action in [:create]
@@ -17,7 +19,7 @@ defmodule Melange.Web.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    case Users.create_user(user_params) do
+    case Users.create_user(user_params, %{}) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "User created successfully.")
@@ -29,12 +31,12 @@ defmodule Melange.Web.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Users.get_user!(id)
+    user = Repo.get!(User, id)
     render(conn, "show.html", user: user)
   end
 
   def edit(conn, %{"id" => id}) do
-    user = Users.get_user!(id)
+    user = Repo.get!(User, id)
     changeset = Users.user_changeset(user, %{})
     render(conn, "edit.html", user: user, changeset: changeset)
   end
@@ -42,21 +44,21 @@ defmodule Melange.Web.UserController do
   def update(conn, %{"id" => id, "user" => user_params}) do
     context = ContextAdapter.adapt(conn)
 
-    case Users.update_user(id, user_params, context) do
+    case Users.update_user(Map.merge(%{"id" => id}, user_params), context) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "User updated successfully.")
         |> redirect(to: user_path(conn, :show, user))
       {:error, %Ecto.Changeset{} = changeset} ->
-        user = Users.get_user!(id)
+        user = Repo.get!(User, id)
         render(conn, "edit.html", user: user, changeset: changeset)
     end
   end
 
   def delete(conn, %{"id" => id}) do
     context = ContextAdapter.adapt(conn)
-    res = Users.delete_user(id, context)
-    
+    res = Users.delete_user(%{"id" => id}, context)
+
     case res do
       {:ok, _user} ->
         conn

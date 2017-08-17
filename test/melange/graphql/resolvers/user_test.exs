@@ -146,6 +146,7 @@ defmodule Melange.GraphQL.Resolvers.UserTest do
       }]
     end
 
+    @tag :current
     test "it allows unsigned users to query other users", %{conn: conn} do
       Fixture.user(%{email: "test1@mail.com"})
       Fixture.user(%{email: "test2@mail.com"})

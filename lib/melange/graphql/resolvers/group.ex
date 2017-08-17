@@ -16,7 +16,7 @@ defmodule Melange.GraphQL.Resolvers.Group do
   def update_group(args, %{context: context}) do
     %{id: id, group: group_args} = args
 
-    Groups.update_group(id, group_args, context)
+    Groups.update_group(Map.merge(group_args, %{id: id}), context)
     |> ErrorAdapter.adapt
   end
 
@@ -26,7 +26,7 @@ defmodule Melange.GraphQL.Resolvers.Group do
   end
 
   def request_join(%{id: id}, %{context: context}) do
-    Groups.request_join(id, context)
+    Groups.request_join(%{group_id: id}, context)
     |> ErrorAdapter.adapt
   end
 

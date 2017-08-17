@@ -7,32 +7,29 @@ defmodule Melange.Users do
 
   def list_users, do: Repo.all(User)
 
-  def get_user!(id), do: Repo.get!(User, id)
-  def get_user(id), do: Repo.get(User, id)
-
   def search(email, _context), do: {:ok, Repo.get_by(User, email: email)}
 
-  def create_user(args) do
+  def create_user(args, _context) do
     %User{}
     |> User.changeset(args)
     |> Repo.insert
   end
 
-  def update_user(id, args, context) do
+  def update_user(args, context) do
     with :ok <- Bouncer.check_authentication(context)
     do
-      user = Users.get_user!(id)
+      user = Repo.get!(User, args["id"] || args.id)
 
       user
-      |> update_user_changeset(args)
-      |> Repo.update
+        |> update_user_changeset(args)
+        |> Repo.update
     end
   end
 
-  def delete_user(id, context) do
+  def delete_user(args, context) do
     with :ok <- Bouncer.check_authentication(context)
     do
-      user = Users.get_user(id)
+      user = Repo.get!(User, args["id"] || args.id)
       current = context.current_user
 
       case user do

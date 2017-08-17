@@ -12,7 +12,7 @@ defmodule Melange.Fixture do
   def user(), do: user(%{})
   def user(args) do
     random_email_map = Map.merge(@user_default, %{email: "#{random_string(10)}@mail.com"})
-    {:ok, user} = Users.create_user(Map.merge(random_email_map, args))
+    {:ok, user} = Users.create_user(Map.merge(random_email_map, args), %{})
     Map.merge(user, %{password: nil}) # remove virtual password field
   end
 
@@ -32,7 +32,7 @@ defmodule Melange.Fixture do
   end
 
   def join_request(group, user) do
-    {:ok, request} = Groups.request_join(group.id, %{current_user: user})
+    {:ok, request} = Groups.request_join(%{group_id: group.id}, %{current_user: user})
     request
   end
 
