@@ -1,4 +1,8 @@
 defmodule Melange.UsersTest do
+  @moduledoc """
+  Users business logic tests
+  """
+
   use Melange.DataCase
 
   alias Melange.Fixture
@@ -6,7 +10,7 @@ defmodule Melange.UsersTest do
   alias Melange.Users
   alias Melange.Users.User
 
-  describe "Users" do
+  describe "Users context" do
     alias Melange.Users.User
 
     @valid_attrs %{

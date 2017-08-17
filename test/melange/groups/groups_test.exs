@@ -1,4 +1,8 @@
 defmodule Melange.GroupsTest do
+  @moduledoc """
+  Groups business logic tests
+  """
+
   alias Melange.Fixture
   alias Melange.Groups
   alias Melange.Groups.Member
@@ -6,7 +10,7 @@ defmodule Melange.GroupsTest do
   import Ecto.Query, only: [from: 2]
   use Melange.DataCase
 
-  describe "Groups resource" do
+  describe "Groups context" do
 
     test "it allows users to create groups" do
       owner = Fixture.user
