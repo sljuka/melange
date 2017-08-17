@@ -18,7 +18,7 @@ defmodule Melange.Users do
   def update_user(args, context) do
     with :ok <- Bouncer.check_authentication(context)
     do
-      user = Repo.get!(User, args["id"] || args.id)
+      user = Repo.get!(User, args["id"])
 
       user
         |> update_user_changeset(args)

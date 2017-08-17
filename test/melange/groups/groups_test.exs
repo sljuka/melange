@@ -21,7 +21,7 @@ defmodule Melange.GroupsTest do
       group = Fixture.group(%{}, owner)
 
       {:ok, group} =
-        Groups.update_group(%{id: group.id, name: "Updated name"},
+        Groups.update_group(%{"id" => group.id, "name" => "Updated name"},
                             %{current_user: owner})
 
       assert group.owner_id == owner.id

@@ -1,42 +1,62 @@
 defmodule Melange.GraphQL.Resolvers.Group do
+  @moduledoc """
+  Graphql integration layer for group features
+  """
+
   alias Melange.Groups
   alias Melange.ErrorAdapter
+  alias Melange.Adapters.ArgsStringifierAdapter, as: ArgsAdapter
+  alias Melange.Adapters.GraphQLContextAdapter, as: ContextAdapter
 
-  def list_groups(args, %{context: context}) do
+  def list_groups(args, info) do
+    context = ContextAdapter.adapt(info)
+
     Groups.list_groups(args, context)
   end
 
-  def create_group(args, %{context: context}) do
-    %{group: group_args} = args
+  def create_group(args, info) do
+    context = ContextAdapter.adapt(info)
+    adapted_args = ArgsAdapter.adapt(args)
+    %{"group" => group_args} = adapted_args
 
-    Groups.create_group(group_args, context)
+    group_args
+    |> Groups.create_group(context)
     |> ErrorAdapter.adapt
   end
 
-  def update_group(args, %{context: context}) do
-    %{id: id, group: group_args} = args
+  def update_group(args, info) do
+    context = ContextAdapter.adapt(info)
+    adapted_args = ArgsAdapter.adapt(args)
 
-    Groups.update_group(Map.merge(group_args, %{id: id}), context)
+    %{"id" => id, "group" => group_args} = adapted_args
+    merged_args = Map.merge(group_args, %{"id" => id})
+
+    merged_args
+    |> Groups.update_group(context)
     |> ErrorAdapter.adapt
   end
 
   def add_role(%{role: args}, %{context: context}) do
-    Groups.add_role(args, context)
+    args
+    |> Groups.add_role(context)
     |> ErrorAdapter.adapt
   end
 
   def request_join(%{id: id}, %{context: context}) do
-    Groups.request_join(%{group_id: id}, context)
+    %{group_id: id}
+    |> Groups.request_join(context)
     |> ErrorAdapter.adapt
   end
 
   def accept_request(%{id: id}, %{context: context}) do
-    Groups.accept_request(id, context)
+    id
+    |> Groups.accept_request(context)
     |> ErrorAdapter.adapt
   end
 
   def remove_member(%{id: id}, %{context: context}) do
-    Groups.remove_member(id, context)
+    id
+    |> Groups.remove_member(context)
     |> ErrorAdapter.adapt
   end
 
@@ -45,36 +65,44 @@ defmodule Melange.GraphQL.Resolvers.Group do
   end
 
   def invite_user(args, %{context: context}) do
-    Groups.invite_user(args, context)
+    args
+    |> Groups.invite_user(context)
     |> ErrorAdapter.adapt
   end
 
   def accept_invite(args, %{context: context}) do
-    Groups.accept_invite(args, context)
+    args
+    |> Groups.accept_invite(context)
     |> ErrorAdapter.adapt
   end
 
   def assign_role(args, %{context: context}) do
-    Groups.assign_role(args, context)
+    args
+    |> Groups.assign_role(context)
     |> ErrorAdapter.adapt
   end
 
   def fetch_group(args, %{context: context}) do
-    Groups.fetch_group(args, context)
+    adapted_args = ArgsAdapter.adapt(args)
+    adapted_args
+    |> Groups.fetch_group(context)
   end
 
   def add_permission(%{permission: permission}, %{context: context}) do
-    Groups.add_permission(permission, context)
+    permission
+    |> Groups.add_permission(context)
     |> ErrorAdapter.adapt
   end
 
   def assign_permission(args, %{context: context}) do
-    Groups.assign_permission(args, context)
+    args
+    |> Groups.assign_permission(context)
     |> ErrorAdapter.adapt
   end
 
   def transfer_ownership(args, %{context: context}) do
-    Groups.transfer_ownership(args, context)
+    args
+    |> Groups.transfer_ownership(context)
     |> ErrorAdapter.adapt
   end
 end

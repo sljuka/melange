@@ -10,13 +10,13 @@ defmodule Melange.UsersTest do
     alias Melange.Users.User
 
     @valid_attrs %{
-      email:      "mike@mail.com",
-      first_name: "Mike",
-      last_name:  "Tyson",
-      password:   "test1234"
+      "email" =>      "mike@mail.com",
+      "first_name" => "Mike",
+      "last_name" =>  "Tyson",
+      "password" =>   "test1234"
     }
-    @update_attrs Map.merge(@valid_attrs, %{first_name: "Michael"})
-    @invalid_attrs %{email: nil, first_name: "First_name2", last_name: "Last_name2"}
+    @update_attrs Map.merge(@valid_attrs, %{"first_name" => "Michael"})
+    @invalid_attrs %{"email" => nil, "first_name" => "First_name2", "last_name" => "Last_name2"}
 
     test "list_users/0 returns all users" do
       user = Fixture.user
@@ -36,14 +36,14 @@ defmodule Melange.UsersTest do
 
     test "update_user/2 with valid data updates the user" do
       user = Fixture.user
-      assert {:ok, updated_user} = Users.update_user(Map.merge(%{id: user.id}, @update_attrs), %{current_user: user})
+      assert {:ok, updated_user} = Users.update_user(Map.merge(%{"id" => user.id}, @update_attrs), %{current_user: user})
       assert %User{} = updated_user
       assert updated_user.first_name == "Michael"
     end
 
     test "update_user/2 with invalid data returns error changeset" do
       user = Fixture.user
-      assert {:error, %Ecto.Changeset{}} = Users.update_user(Map.merge(%{id: user.id}, @invalid_attrs), %{current_user: user})
+      assert {:error, %Ecto.Changeset{}} = Users.update_user(Map.merge(%{"id" => user.id}, @invalid_attrs), %{current_user: user})
       assert user == Repo.get!(User, user.id)
     end
 

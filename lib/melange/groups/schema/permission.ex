@@ -4,7 +4,7 @@ defmodule Melange.Groups.Permission do
   use Ecto.Schema
 
   schema "permissions" do
-    belongs_to :group,       Melange.Groups.Group
+    belongs_to :group,       Group
     field      :name,        :string
     field      :description, :string
 

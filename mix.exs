@@ -42,6 +42,7 @@ defmodule Melange.Mixfile do
      {:guardian, "~> 0.13.0"},
      {:absinthe_plug, "~> 1.1"},
      {:poison, "~> 2.2.0"},
+     {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
      {:absinthe_ecto, "~> 0.1.0"}]
   end
 
