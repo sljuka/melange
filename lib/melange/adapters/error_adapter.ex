@@ -1,4 +1,4 @@
-defmodule Melange.ErrorAdapter do
+defmodule Melange.Adapters.ErrorAdapter do
   alias Melange.ErrorMessages
 
   def adapt(result) do

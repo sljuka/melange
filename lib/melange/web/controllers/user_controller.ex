@@ -5,8 +5,8 @@ defmodule Melange.Web.UserController do
   alias Melange.Web.ContextAdapter
   alias Melange.Repo
 
-  plug Guardian.Plug.EnsureAuthenticated, handler: Melange.Web.DefaultAuthErrorHandler
-  plug :scrub_params, "user" when action in [:create]
+  plug Guardian.Plug.EnsureAuthenticated, [handler: Melange.Web.DefaultAuthErrorHandler] when not action in [:create, :new]
+  plug :scrub_params, "user" when action in [:create, :update]
 
   def index(conn, _params) do
     users = Users.list_users

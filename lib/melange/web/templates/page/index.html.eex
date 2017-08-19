@@ -3,7 +3,15 @@
   <p class="lead">A productive web framework that<br />does not compromise speed and maintainability.</p>
 </div>
 
+<ul>
+  <%= if @current_user do %>
+    <li><%= link("Users administration", to: "/users") %></li>
+  <% end %>
+  <li><%= link("Do some graphql", to: "/graphiql") %></li>
+</ul>
 
+
+<h3>Chat:</h3>
 <div id="messages"></div>
 <input id="chat-input" type="text"></input>
 

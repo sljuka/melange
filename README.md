@@ -29,7 +29,8 @@ Since this is a PoC, business logic is pretty simple for now:
   * System allows signed users to invite users to join a group
   * System allows users to accept request joins/invitations
   * System allows transferring group ownership from one member to another
-  ... these are main features
+
+... these are main features
 
 Business logic is implemented inside Phoenix 1.3 contexts.
 
@@ -46,7 +47,7 @@ on [`localhost:4000/graphiql`](http://localhost:4000/graphiql) from the browser.
   * Source: https://github.com/phoenixframework/phoenix
 
 
-# TODO
+# TODO feature list
 
 - [x] User registration
 - [x] User authentication
