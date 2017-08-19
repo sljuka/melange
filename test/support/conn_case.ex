@@ -22,7 +22,7 @@ defmodule Melange.Web.ConnCase do
       import Melange.Web.Router.Helpers
       import Melange.GraphqlTestHelper
       alias Melange.Fixture
-      alias Melange.GraphQL.Resolvers.User
+      alias Melange.GraphQL.UserResolver
 
       # The default endpoint for testing
       @endpoint Melange.Web.Endpoint
@@ -47,7 +47,7 @@ defmodule Melange.Web.ConnCase do
           config[:token_login_as] || config[:token_login] ->
             email = config[:token_login_as] || "test@mail.com"
             user = Fixture.user(%{email: email})
-            {:ok, %{token: token}} = User.login(%{email: email, password: "test1234"}, %{})
+            {:ok, %{token: token}} = UserResolver.login(%{email: email, password: "test1234"}, %{})
 
             conn =
               build_conn()

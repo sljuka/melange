@@ -1,4 +1,4 @@
-defmodule Melange.GraphQL.Resolvers.UserTest do
+defmodule Melange.GraphQL.UserResolverTest do
   alias Melange.Fixture
   use Melange.Web.ConnCase
 

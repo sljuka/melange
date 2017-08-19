@@ -1,4 +1,4 @@
-defmodule Melange.GraphQL.Resolvers.Group do
+defmodule Melange.GraphQL.GroupResolver do
   @moduledoc """
   Graphql integration layer for group features
   """

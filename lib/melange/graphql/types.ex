@@ -1,7 +1,7 @@
 defmodule Melange.GraphQL.Types do
   use Absinthe.Schema.Notation
   use Absinthe.Ecto, repo: Melange.Repo
-  alias Melange.GraphQL.Resolvers.Group, as: GroupResolver
+  alias Melange.GraphQL.GroupResolver
 
   object :user do
     field :id,            :id

@@ -1,8 +1,8 @@
 defmodule Melange.GraphQL.Schema do
   use Absinthe.Schema
   import_types Melange.GraphQL.Types
-  alias Melange.GraphQL.Resolvers.User, as: UserResolver
-  alias Melange.GraphQL.Resolvers.Group, as: GroupResolver
+  alias Melange.GraphQL.UserResolver
+  alias Melange.GraphQL.GroupResolver
 
   query do
     field :users,  list_of(:user),  do: resolve &UserResolver.list_users/2

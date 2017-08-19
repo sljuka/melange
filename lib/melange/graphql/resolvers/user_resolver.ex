@@ -1,4 +1,4 @@
-defmodule Melange.GraphQL.Resolvers.User do
+defmodule Melange.GraphQL.UserResolver do
   @moduledoc """
   Graphql integration layer for user features
   """
