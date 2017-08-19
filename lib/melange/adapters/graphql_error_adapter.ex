@@ -1,4 +1,4 @@
-defmodule Melange.Adapters.ErrorAdapter do
+defmodule Melange.Adapters.GraphQLErrorAdapter do
   alias Melange.ErrorMessages
 
   def adapt(result) do

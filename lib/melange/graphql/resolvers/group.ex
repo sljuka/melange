@@ -4,7 +4,7 @@ defmodule Melange.GraphQL.Resolvers.Group do
   """
 
   alias Melange.Groups
-  alias Melange.Adapters.ErrorAdapter
+  alias Melange.Adapters.GraphQLErrorAdapter, as: ErrorAdapter
   alias Melange.Adapters.ArgsStringifierAdapter, as: ArgsAdapter
   alias Melange.Adapters.GraphQLContextAdapter, as: ContextAdapter
 

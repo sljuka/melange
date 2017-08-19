@@ -5,7 +5,7 @@ defmodule Melange.GraphQL.Resolvers.User do
 
   alias Melange.Adapters.GraphQLContextAdapter, as: ContextAdapter
   alias Melange.Adapters.ArgsStringifierAdapter, as: ArgsAdapter
-  alias Melange.Adapters.ErrorAdapter
+  alias Melange.Adapters.GraphQLErrorAdapter, as: ErrorAdapter
   alias Melange.Users
 
   def list_users(_args, _info) do
