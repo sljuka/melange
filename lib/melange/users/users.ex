@@ -9,6 +9,14 @@ defmodule Melange.Users do
 
   def search(email, _context), do: {:ok, Repo.get_by(User, email: email)}
 
+  def current_user(_args, context) do
+    with :ok <- Bouncer.check_authentication(context)
+    do
+      %{current_user: current_user} = context
+      search(current_user.email, context)
+    end
+  end
+
   def create_user(args, _context) do
     %User{}
     |> User.changeset(args)

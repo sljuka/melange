@@ -13,7 +13,8 @@ defmodule Melange.GraphQL.Schema do
 
       resolve &GroupResolver.fetch_group/2
     end
-    field :user, type: :user do
+    field :current_user, :user, do: resolve &UserResolver.current_user/2
+    field :user, :user do
       arg :email, non_null(:string)
 
       resolve &UserResolver.search/2

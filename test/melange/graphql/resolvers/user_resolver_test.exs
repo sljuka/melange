@@ -2,7 +2,7 @@ defmodule Melange.GraphQL.UserResolverTest do
   alias Melange.Fixture
   use Melange.Web.ConnCase
 
-  describe "Users resource" do
+  describe "User resolver" do
     test "it allows unsigned users to register an account", %{conn: conn} do
       query = """
       mutation {
@@ -37,7 +37,6 @@ defmodule Melange.GraphQL.UserResolverTest do
       assert(byte_size(token_data["login"]["token"]) > 50)
     end
 
-    @tag :current
     test "it reports an error in case user tries to login with bad creds", %{conn: conn} do
       query = """
       mutation {
@@ -54,7 +53,6 @@ defmodule Melange.GraphQL.UserResolverTest do
       }]
     end
 
-    @tag :current
     test "it responds with error when registering an account with invalid data", %{conn: conn} do
       query = """
       mutation {
@@ -108,7 +106,6 @@ defmodule Melange.GraphQL.UserResolverTest do
       }
     end
 
-    @tag :current
     @tag :token_login
     test "it responds with an error when updating an account with invalid data", %{conn: conn, user: user} do
       query = """
@@ -127,7 +124,6 @@ defmodule Melange.GraphQL.UserResolverTest do
       }], 400
     end
 
-    @tag :current
     test "it does not allow unsigned users to update accounts", %{conn: conn} do
       user = Fixture.user
 
@@ -146,7 +142,6 @@ defmodule Melange.GraphQL.UserResolverTest do
       }]
     end
 
-    @tag :current
     test "it allows unsigned users to query other users", %{conn: conn} do
       Fixture.user(%{email: "test1@mail.com"})
       Fixture.user(%{email: "test2@mail.com"})
@@ -166,6 +161,26 @@ defmodule Melange.GraphQL.UserResolverTest do
           %{"email" => "test2@mail.com"},
           %{"email" => "test3@mail.com"}
         ]
+      }
+    end
+
+    @tag :current
+    @tag :token_login
+    test "it allows signed users to query their own data", %{conn: conn, user: user} do
+      query = """
+      {
+        current_user {
+          name
+          email
+        }
+      }
+      """
+
+      assert_gql_data conn, query, %{
+        "current_user" => %{
+          "email" => user.email,
+          "name" => "#{user.first_name} #{user.last_name}",
+        }
       }
     end
   end

@@ -20,7 +20,7 @@ defmodule Melange.Users.User do
     user
     |> cast(params, [:first_name, :last_name, :email, :password])
     |> validate_required([:email, :password])
-    |> unique_constraint(:email)
+    |> unique_constraint(:email, message: "has_been_taken")
     |> hash_password()
   end
 
@@ -28,7 +28,7 @@ defmodule Melange.Users.User do
     user
     |> cast(params, [:first_name, :last_name, :email, :password])
     |> validate_required([:email, :password_hash])
-    |> unique_constraint(:email)
+    |> unique_constraint(:email, message: "has_been_taken")
     |> hash_password()
   end
 

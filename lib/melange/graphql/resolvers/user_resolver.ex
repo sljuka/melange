@@ -41,6 +41,12 @@ defmodule Melange.GraphQL.UserResolver do
     |> ErrorAdapter.adapt
   end
 
+  def current_user(args, %{context: context}) do
+    args
+    |> Users.current_user(context)
+    |> ErrorAdapter.adapt
+  end
+
   def login(%{email: email, password: password}, _info) do
     with {:ok, user} <- Users.find_and_checkpw(email, password),
          {:ok, jwt, _} <- Guardian.encode_and_sign(user, :access)

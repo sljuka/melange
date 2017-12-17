@@ -43,6 +43,7 @@ defmodule Melange.Mixfile do
      {:absinthe_plug, "~> 1.1"},
      {:poison, "~> 2.2.0"},
      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
+     {:cors_plug, "~> 1.2"},
      {:absinthe_ecto, "~> 0.1.0"}]
   end
 
