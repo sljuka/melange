@@ -6,18 +6,18 @@ const Header = styled.p`
   font-size: 1.5em;
 `;
 
-const SignUpPanel = ({ onClick }) => (
+const SignUpPanel = ({ selectPanel }) => (
   <div>
-    <Header>Don&apos;t have an account?</Header>
-    <p>Signup by clicking here</p>
-    <button onClick={onClick}>
+    <Header>No account?</Header>
+    <p>NP, signup for an account!</p>
+    <button onClick={selectPanel}>
     Sign up
     </button>
   </div>
 );
 
 SignUpPanel.propTypes = {
-  onClick: PropTypes.func.isRequired,
+  selectPanel: PropTypes.func.isRequired,
 };
 
 export default SignUpPanel;

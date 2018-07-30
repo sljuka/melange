@@ -15,7 +15,7 @@ type Props = {
 const LogInPanel = ({ onClick }: Props) => (
   <div>
     <Header>Have an account?</Header>
-    <p>Welcome back, login here ;)</p>
+    <p>Welcome back ;)</p>
     <button onClick={onClick}>
     Log in
     </button>

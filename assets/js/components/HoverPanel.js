@@ -3,24 +3,23 @@ import { Motion, spring } from 'react-motion';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import RPT from 'prop-types';
-import { logIn } from '../actions/authentication';
-import LoginPanel from '../components/LogInPanel';
-import SignUpPanel from '../components/SignUpPanel';
-import LoginForm from '../containers/LoginForm';
 
 const springConf = { stiffness: 200, damping: 15 };
 
 const Container = styled.div`
+  border: 1px solid black;
   position: relative;
   max-width: 960px;
   margin: auto;
+  font-family: "Helvetica", "Arial", sans-serif;
 `;
 
 const FloatingPanel = styled.div.attrs({
   style: ({ left }) => ({ left: `${left}%` }),
 })`
+  border: 1px solid black;
   position: absolute;
-  top: -20px;
+  top: 10px;
   background-color: #f1f1f1;
   width: 50%;
   height: 440px;
@@ -28,16 +27,14 @@ const FloatingPanel = styled.div.attrs({
 `;
 
 const FlexContainer = styled.div`
-  margin-top: 100px;
   display: flex;
   flex-wrap: nowrap;
-  background-color: #9c9e9e;
   justify-content: space-around;
   text-align: start;
 `;
 
 const FlexPanel = styled.div`
-  background-color: #9c9e9e;
+  background-color: white;
   width: 400px;
   height: 400px;
   text-align: center;
@@ -52,7 +49,18 @@ const FloatContainer = styled.div`
   padding: 70px 70px;
 `;
 
-export default class HoverPanel extends React.Component {
+type PropsType = {
+  LeftPanel: React.Element<*>,
+  RightPanel: React.Element<*>,
+  LeftHoverPanel: React.Element<*>,
+  RightHoverPanel: React.Element<*>,
+}
+
+type StateType = {
+  firstPanelSelected: Boolean,
+}
+
+export default class HoverPanel extends React.Component<StateType, PropsType> {
   constructor(props) {
     super(props);
     this.state = {
@@ -62,25 +70,30 @@ export default class HoverPanel extends React.Component {
 
   render() {
     const { firstPanelSelected } = this.state;
-    const { onClick } = this.props;
-    const leftPercentage = firstPanelSelected ? 5 : 45;
-    const springAnimation = spring(leftPercentage, springConf);
+    const {
+      LeftPanel,
+      RightPanel,
+      LeftHoverPanel,
+      RightHoverPanel,
+    } = this.props;
+    const movePercentage = firstPanelSelected ? 5 : 45;
+    const springInterpolation = spring(movePercentage, springConf);
 
     return (
       <Container>
         <FlexContainer>
           <FlexPanel>
-            <LoginPanel onClick={() => this.setState({ firstPanelSelected: true })} />
+            <LeftPanel selectPanel={() => this.setState({ firstPanelSelected: true })} />
           </FlexPanel>
           <FlexPanel>
-            <SignUpPanel onClick={() => this.setState({ firstPanelSelected: false })} />
+            <RightPanel selectPanel={() => this.setState({ firstPanelSelected: false })} />
           </FlexPanel>
-          <Motion style={{ left: springAnimation }}>
+          <Motion style={{ left: springInterpolation }}>
             {({ left }) => (
               <FloatingPanel left={left}>
                 <FloatContainer>
-                  {firstPanelSelected && <LoginForm handleSubmit={this.props.onClick} />}
-                  {!firstPanelSelected && <span>TEST 2</span>}
+                  {firstPanelSelected && <LeftHoverPanel />}
+                  {!firstPanelSelected && <RightHoverPanel />}
                 </FloatContainer>
               </FloatingPanel>
             )}

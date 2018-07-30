@@ -12,13 +12,16 @@
     "phoenix_html": "file:../deps/phoenix_html",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "react-motion": "^0.5.2",
     "react-redux": "^5.0.7",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "styled-components": "^3.3.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.52",
     "@babel/core": "^7.0.0-beta.52",
     "@babel/preset-env": "^7.0.0-beta.52",
+    "@babel/preset-flow": "^7.0.0-beta.55",
     "@babel/preset-react": "^7.0.0-beta.52",
     "@storybook/react": "^3.4.8",
     "babel-core": "7.0.0-bridge.0",
