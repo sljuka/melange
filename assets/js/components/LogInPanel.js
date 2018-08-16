@@ -3,22 +3,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import Button from '../components/Button';
 
 const Header = styled.p`
   font-size: 1.5em;
 `;
 
 type Props = {
-  onClick: () => void,
+  selectPanel: () => void,
 }
 
-const LogInPanel = ({ onClick }: Props) => (
+const LogInPanel = ({ selectPanel }: Props) => (
   <div>
     <Header>Have an account?</Header>
-    <p>Welcome back ;)</p>
-    <button onClick={onClick}>
-    Log in
-    </button>
+    <p>Welcome back</p>
+    <Button onClick={selectPanel}>Log in</Button>
   </div>
 );
 

@@ -3,6 +3,7 @@ import { Motion, spring } from 'react-motion';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import RPT from 'prop-types';
+import { withState, compose, withHandlers } from 'recompose';
 
 const springConf = { stiffness: 200, damping: 15 };
 
@@ -50,56 +51,62 @@ const FloatContainer = styled.div`
 `;
 
 type PropsType = {
-  LeftPanel: React.Element<*>,
-  RightPanel: React.Element<*>,
-  LeftHoverPanel: React.Element<*>,
-  RightHoverPanel: React.Element<*>,
+  FirstPanel: React.Element<*>,
+  SecondPanel: React.Element<*>,
+  FirstHoverPanel: React.Element<*>,
+  SecondHoverPanel: React.Element<*>,
+  firstPanelSelected: Boolean,
+  selectFirstPanel: () => void,
+  selectSecondPanel: () => void,
 }
 
 type StateType = {
   firstPanelSelected: Boolean,
 }
 
-export default class HoverPanel extends React.Component<StateType, PropsType> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      firstPanelSelected: true,
-    };
-  }
+const HoverPanel = ({
+  FirstPanel,
+  SecondPanel,
+  FirstHoverPanel,
+  SecondHoverPanel,
+  firstPanelSelected,
+  selectFirstPanel,
+  selectSecondPanel,
+}: PropsType) => {
+  const movePercentage = firstPanelSelected ? 5 : 45;
+  const springInterpolation = spring(movePercentage, springConf);
 
-  render() {
-    const { firstPanelSelected } = this.state;
-    const {
-      LeftPanel,
-      RightPanel,
-      LeftHoverPanel,
-      RightHoverPanel,
-    } = this.props;
-    const movePercentage = firstPanelSelected ? 5 : 45;
-    const springInterpolation = spring(movePercentage, springConf);
-
-    return (
+  return (
+    <div>
+      <h1>Hi!</h1>
       <Container>
         <FlexContainer>
           <FlexPanel>
-            <LeftPanel selectPanel={() => this.setState({ firstPanelSelected: true })} />
+            <FirstPanel selectPanel={selectFirstPanel} />
           </FlexPanel>
           <FlexPanel>
-            <RightPanel selectPanel={() => this.setState({ firstPanelSelected: false })} />
+            <SecondPanel selectPanel={selectSecondPanel} />
           </FlexPanel>
           <Motion style={{ left: springInterpolation }}>
             {({ left }) => (
               <FloatingPanel left={left}>
                 <FloatContainer>
-                  {firstPanelSelected && <LeftHoverPanel />}
-                  {!firstPanelSelected && <RightHoverPanel />}
+                  {firstPanelSelected && <FirstHoverPanel />}
+                  {!firstPanelSelected && <SecondHoverPanel />}
                 </FloatContainer>
               </FloatingPanel>
             )}
           </Motion>
         </FlexContainer>
       </Container>
-    );
-  }
+    </div>
+  );
 }
+
+export default compose(
+  withState('firstPanelSelected', 'setFirstPanelSelected', true),
+  withHandlers({
+    selectFirstPanel: ({ setFirstPanelSelected }) => () => setFirstPanelSelected(true),
+    selectSecondPanel: ({ setFirstPanelSelected }) => () => setFirstPanelSelected(false),
+  })
+)(HoverPanel)
