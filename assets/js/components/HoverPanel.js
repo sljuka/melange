@@ -10,8 +10,6 @@ const springConf = { stiffness: 200, damping: 15 };
 const Container = styled.div`
   border: 1px solid black;
   position: relative;
-  max-width: 960px;
-  margin: auto;
   font-family: "Helvetica", "Arial", sans-serif;
 `;
 
@@ -28,10 +26,12 @@ const FloatingPanel = styled.div.attrs({
 `;
 
 const FlexContainer = styled.div`
+  position: relative;
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-around;
   text-align: start;
+  border: 1px solid;
 `;
 
 const FlexPanel = styled.div`
@@ -77,29 +77,24 @@ const HoverPanel = ({
   const springInterpolation = spring(movePercentage, springConf);
 
   return (
-    <div>
-      <h1>Hi!</h1>
-      <Container>
-        <FlexContainer>
-          <FlexPanel>
-            <FirstPanel selectPanel={selectFirstPanel} />
-          </FlexPanel>
-          <FlexPanel>
-            <SecondPanel selectPanel={selectSecondPanel} />
-          </FlexPanel>
-          <Motion style={{ left: springInterpolation }}>
-            {({ left }) => (
-              <FloatingPanel left={left}>
-                <FloatContainer>
-                  {firstPanelSelected && <FirstHoverPanel />}
-                  {!firstPanelSelected && <SecondHoverPanel />}
-                </FloatContainer>
-              </FloatingPanel>
-            )}
-          </Motion>
-        </FlexContainer>
-      </Container>
-    </div>
+    <FlexContainer>
+      <FlexPanel>
+        <FirstPanel selectPanel={selectFirstPanel} />
+      </FlexPanel>
+      <FlexPanel>
+        <SecondPanel selectPanel={selectSecondPanel} />
+      </FlexPanel>
+      <Motion style={{ left: springInterpolation }}>
+        {({ left }) => (
+          <FloatingPanel left={left}>
+            <FloatContainer>
+              {firstPanelSelected && <FirstHoverPanel />}
+              {!firstPanelSelected && <SecondHoverPanel />}
+            </FloatContainer>
+          </FloatingPanel>
+        )}
+      </Motion>
+    </FlexContainer>
   );
 }
 

@@ -6,13 +6,13 @@ import Button from '../components/Button';
 const LoginForm = () => (
   <form>
     <FormGroup>
-      <TextInput placeholder="username or email" />
+      <TextInput placeholder="Username or email" />
     </FormGroup>
     <FormGroup>
-      <TextInput type="password" placeholder="password" />
+      <TextInput type="password" placeholder="Password" />
     </FormGroup>
     <FormGroup>
-      <Button onClick={(e) => e.preventDefault()}>Submit</Button>
+      <Button onClick={(e) => e.preventDefault()}>Log in</Button>
     </FormGroup>
   </form>
 )

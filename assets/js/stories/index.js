@@ -8,8 +8,17 @@ import SignUpPanel from '../components/SignUpPanel';
 import Progress from '../components/Progress';
 import LoginForm from '../components/LoginForm';
 import SignUpForm from '../components/SignUpForm';
+import Container from '../components/Container';
+import Navbar from '../components/Navbar'
+
+const ContainerDecorator = (storyFn) => (
+  <Container>
+    { storyFn() }
+  </Container>
+);
 
 storiesOf('Button', module)
+  .addDecorator(ContainerDecorator)
   .add('with text', () => (
     <button onClick={action('clicked')}>Hello Button</button>
   ))
@@ -23,4 +32,7 @@ storiesOf('Button', module)
       FirstHoverPanel={LoginForm}
       SecondHoverPanel={SignUpForm}
     />
+  ))
+  .add('Navbar', () => (
+    <Navbar />
   ))

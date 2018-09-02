@@ -6,19 +6,19 @@ import Button from '../components/Button';
 const RegisterForm = () => (
   <form>
     <FormGroup>
-      <TextInput placeholder="email" />
+      <TextInput placeholder="Email" />
     </FormGroup>
     <FormGroup>
-      <TextInput placeholder="name" />
+      <TextInput placeholder="Name" />
     </FormGroup>
     <FormGroup>
-      <TextInput placeholder="username" />
+      <TextInput placeholder="Username" />
     </FormGroup>
     <FormGroup>
-      <TextInput type="password" placeholder="password" />
+      <TextInput type="password" placeholder="Password" />
     </FormGroup>
     <FormGroup>
-      <Button onClick={(e) => e.preventDefault()}>Submit</Button>
+      <Button onClick={(e) => e.preventDefault()}>Sign up</Button>
     </FormGroup>
   </form>
 )
