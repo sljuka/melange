@@ -3,6 +3,37 @@ defmodule Melange.GraphQL.Schema do
   import_types Melange.GraphQL.Types
   alias Melange.GraphQL.UserResolver
   alias Melange.GraphQL.GroupResolver
+  alias Melange.Groups.{
+    Group,
+    GroupInvite,
+    Role,
+    Member,
+    Permission,
+    JoinRequest
+  }
+  alias Melange.Users.User
+
+  def ecto_query(queryable, _params) do
+    queryable
+  end
+
+  def context(ctx) do
+    loader =
+      Dataloader.new
+      |> Dataloader.add_source(Group, Dataloader.Ecto.new(Melange.Repo, query: &ecto_query/2))
+      |> Dataloader.add_source(GroupInvite, Dataloader.Ecto.new(Melange.Repo, query: &ecto_query/2))
+      |> Dataloader.add_source(Role, Dataloader.Ecto.new(Melange.Repo, query: &ecto_query/2))
+      |> Dataloader.add_source(Member, Dataloader.Ecto.new(Melange.Repo, query: &ecto_query/2))
+      |> Dataloader.add_source(Permission, Dataloader.Ecto.new(Melange.Repo, query: &ecto_query/2))
+      |> Dataloader.add_source(JoinRequest, Dataloader.Ecto.new(Melange.Repo, query: &ecto_query/2))
+      |> Dataloader.add_source(User, Dataloader.Ecto.new(Melange.Repo, query: &ecto_query/2))
+  
+    Map.put(ctx, :loader, loader)
+  end
+
+  def plugins do
+    [Absinthe.Middleware.Dataloader] ++ Absinthe.Plugin.defaults()
+  end
 
   query do
     field :users,  list_of(:user),  do: resolve &UserResolver.list_users/2

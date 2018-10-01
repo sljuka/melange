@@ -6,18 +6,21 @@ defmodule Melange.Web.UserControllerTest do
   @update_attrs Map.merge(@create_attrs, %{first_name: "updated_first_name", last_name: "updated_last_name", email: "new@mail.com"})
   @invalid_attrs %{first_name: nil, last_name: nil, email: nil}
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "lists all users on index", %{conn: conn, user: _user} do
     conn = get conn, user_path(conn, :index)
     assert html_response(conn, 200) =~ "Listing Users"
   end
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "renders form for new users", %{conn: conn, user: _user} do
     conn = get conn, user_path(conn, :new)
     assert html_response(conn, 200) =~ "New User"
   end
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "creates user and redirects to show when data is valid", %{conn: conn, user: _user} do
     conn = post conn, user_path(conn, :create), user: @create_attrs
@@ -29,12 +32,14 @@ defmodule Melange.Web.UserControllerTest do
     assert html_response(conn, 200) =~ "Show User"
   end
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "does not create user and renders errors when data is invalid", %{conn: conn} do
     conn = post conn, user_path(conn, :create), user: @invalid_attrs
     assert html_response(conn, 200) =~ "New User"
   end
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "renders form for editing chosen user", %{conn: conn} do
     user = Fixture.user
@@ -42,6 +47,7 @@ defmodule Melange.Web.UserControllerTest do
     assert html_response(conn, 200) =~ "Edit User"
   end
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "updates chosen user and redirects when data is valid", %{conn: conn, user: _user} do
     user = Fixture.user
@@ -52,6 +58,7 @@ defmodule Melange.Web.UserControllerTest do
     assert html_response(conn, 200) =~ "updated_first_name"
   end
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "does not update chosen user and renders errors when data is invalid", %{conn: conn, user: _user} do
     user = Fixture.user
@@ -59,6 +66,7 @@ defmodule Melange.Web.UserControllerTest do
     assert html_response(conn, 200) =~ "Edit User"
   end
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "deletes chosen user", %{conn: conn, user: _user} do
     user = Fixture.user
@@ -69,6 +77,7 @@ defmodule Melange.Web.UserControllerTest do
     assert html_response(conn, 200) =~ "User deleted successfully"
   end
 
+  @tag :pending
   @tag login_as: "pera@mail.com"
   test "cannot delete self", %{conn: conn, user: user} do
     conn = delete conn, user_path(conn, :delete, user)

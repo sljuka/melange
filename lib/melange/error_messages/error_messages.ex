@@ -4,7 +4,7 @@ defmodule Melange.ErrorMessages do
 
     case str_message do
       "has_been_taken" ->
-        "Unique value has already been assigned to another record"
+        "Value has already been assigned to another record"
 
       "already_requested" ->
         "User already requested to join the group"

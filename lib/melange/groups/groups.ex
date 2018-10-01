@@ -81,7 +81,7 @@ defmodule Melange.Groups do
     do
       %{current_user: current_user} = context
       if is_member?(group_id, current_user.id) do
-        {:error, "group_id", :already_member}
+        {:error, :group_id, :already_member}
       else
         %JoinRequest{}
         |> JoinRequest.changeset(%{user_id: current_user.id, group_id: group_id})
@@ -110,7 +110,7 @@ defmodule Melange.Groups do
     do
       group = Repo.get!(Group, group_id)
       if group.owner_id === member.user_id do
-        {:error, "id", :can_not_remove_owner}
+        {:error, :id, :can_not_remove_owner}
       else
         Repo.delete(member)
         {:ok, group}

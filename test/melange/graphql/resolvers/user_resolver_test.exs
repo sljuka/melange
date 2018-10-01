@@ -3,7 +3,7 @@ defmodule Melange.GraphQL.UserResolverTest do
   use Melange.Web.ConnCase
 
   describe "User resolver" do
-    test "it allows unsigned users to register an account", %{conn: conn} do
+    test "user can register an account", %{conn: conn} do
       query = """
       mutation {
         create_user(user: {first_name: "Mark", last_name: "Twain", email: "mtwain@fastmail.com", password: "pass1234"}) {
@@ -13,7 +13,8 @@ defmodule Melange.GraphQL.UserResolverTest do
       }
       """
 
-      assert_gql_data conn, query, %{
+      %{ data: data } = Absinthe.run!(query, Melange.GraphQL.Schema)
+      assert data == %{
         "create_user" => %{
           "name" => "Mark Twain",
           "email" => "mtwain@fastmail.com"
@@ -32,9 +33,8 @@ defmodule Melange.GraphQL.UserResolverTest do
       }
       """
 
-      token_data = gql_data conn, query
-
-      assert(byte_size(token_data["login"]["token"]) > 50)
+      %{ data: data } = Absinthe.run!(query, Melange.GraphQL.Schema)
+      assert(byte_size(data["login"]["token"]) > 50)
     end
 
     test "it reports an error in case user tries to login with bad creds", %{conn: conn} do
@@ -46,10 +46,11 @@ defmodule Melange.GraphQL.UserResolverTest do
       }
       """
 
-      assert_gql_error_data conn, query, [%{
-        "field" => "email",
-        "message" => "Invalid email or password",
-        "short_message" => "invalid_creds"
+      %{errors: [%{error: error}]} = Absinthe.run!(query, Melange.GraphQL.Schema)
+      assert error == [%{
+        field: "email",
+        message: "Invalid email or password",
+        short_message: :invalid_creds
       }]
     end
 
@@ -164,7 +165,6 @@ defmodule Melange.GraphQL.UserResolverTest do
       }
     end
 
-    @tag :current
     @tag :token_login
     test "it allows signed users to query their own data", %{conn: conn, user: user} do
       query = """

@@ -40,11 +40,11 @@ defmodule Melange.Mixfile do
      {:distillery, "~> 1.4"},
      {:comeonin, "~> 2.5"},
      {:guardian, "~> 0.13.0"},
-     {:absinthe_plug, "~> 1.4.0"},
+     {:absinthe_plug, "~> 1.4.2"},
      {:poison, "~> 2.2.0"},
      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
      {:cors_plug, "~> 1.2"},
-     {:absinthe_ecto, "~> 0.1.3"}]
+     {:dataloader, "~> 1.0.0"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
