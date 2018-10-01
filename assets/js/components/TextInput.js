@@ -6,7 +6,7 @@ const TextInput = styled.input.attrs({
 })`
   margin: 0;
   display: block;
-  width: 100%;
+  width: auto;
   padding: .375rem .75rem;
   font-size: 1rem;
   line-height: 1.5;

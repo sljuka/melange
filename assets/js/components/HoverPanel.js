@@ -5,12 +5,15 @@ import { connect } from 'react-redux';
 import RPT from 'prop-types';
 import { withState, compose, withHandlers } from 'recompose';
 
-const springConf = { stiffness: 200, damping: 15 };
+const springConf = { stiffness: 300, damping: 20 };
 
-const Container = styled.div`
-  border: 1px solid black;
+const FlexContainer = styled.div`
   position: relative;
-  font-family: "Helvetica", "Arial", sans-serif;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  text-align: start;
+  border: 1px solid;
 `;
 
 const FloatingPanel = styled.div.attrs({
@@ -23,15 +26,9 @@ const FloatingPanel = styled.div.attrs({
   width: 50%;
   height: 440px;
   font-size: 1em;
-`;
-
-const FlexContainer = styled.div`
-  position: relative;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-around;
-  text-align: start;
-  border: 1px solid;
+  @media (max-width: 740px) {
+    height: 370px;
+  }
 `;
 
 const FlexPanel = styled.div`
