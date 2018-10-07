@@ -1,0 +1,54 @@
+version: "3"
+services:
+  web:
+    # replace username/repo:tag with your name and image details
+    image: melange:wip
+    depends_on:
+      - "db"
+    environment:
+      DATABASE_URL: ecto://postgres:example@db/melange_prod
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 200M
+    ports:
+      - "4000:4000"
+    networks:
+      - webnet
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - webnet
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    volumes:
+      - data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - webnet
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 4001:8080
+    networks:
+      - webnet
+networks:
+  webnet:
+volumes:
+  data: {}
