@@ -1,0 +1,21 @@
+FROM bitwalker/alpine-elixir:1.6.6
+
+WORKDIR /opt/melange
+
+#Copy the source folder into the Docker image
+COPY . .
+
+#Install dependencies and build Release
+ENV MIX_ENV=prod
+RUN apk update && \
+    apk add -u musl musl-dev musl-utils build-base postgresql-client
+RUN mix deps.get --only prod
+RUN mix deps.compile
+RUN mix compile
+RUN mix release
+
+#Change user
+USER default
+
+#Set default entrypoint and command
+CMD ["./migrator.sh"]
